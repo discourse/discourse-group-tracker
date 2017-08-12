@@ -1,0 +1,7 @@
+{{#if context.topic.first_tracked_post}}
+  <span class="first-tracked-post group-{{context.topic.first_tracked_post.group}}">
+    <a href="{{context.topic.url}}/{{context.topic.first_tracked_post.post_number}}" title="{{i18n "group_tracker.first_group_post" group=context.topic.first_tracked_post.group}}">
+      {{d-icon 'arrow-circle-right'}}
+    </a>
+  </span>
+{{/if}}

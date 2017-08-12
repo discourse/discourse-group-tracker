@@ -1,0 +1,163 @@
+# name: discourse-group-tracker
+# about: Group Tracker plugin for Discourse
+# version: 0.1
+# author: Régis Hanol
+
+after_initialize do
+
+  load File.expand_path("../lib/group_tracker.rb", __FILE__)
+  load File.expand_path("../app/serializers/tracked_group_serializer.rb", __FILE__)
+  load File.expand_path("../app/controllers/admin/groups_controller.rb", __FILE__)
+
+  Discourse::Application.routes.append do
+    namespace :admin, constraints: AdminConstraint.new do
+      GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
+        put "groups/:id/toggle_#{attribute}" => "groups#toggle_#{attribute}", constraints: { id: /\d+/ }
+      end
+    end
+  end
+
+  GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
+    add_preloaded_group_custom_field(GroupTracker.key(attribute))
+    register_group_custom_field_type(GroupTracker.key(attribute), :boolean)
+
+    add_to_serializer(:basic_group, attribute.to_sym) do
+      object.custom_fields[GroupTracker.key(attribute)]
+    end
+
+    add_to_serializer(:basic_group, "include_#{attribute}?".to_sym) do
+      object.custom_fields[GroupTracker::TRACK_POSTS]
+    end
+  end
+
+  TRACKED_GROUPS ||= "tracked_groups".freeze
+
+  add_to_serializer(:site, :tracked_groups) do
+    cache_fragment(TRACKED_GROUPS) do
+      tracked_groups = Group.where(id: GroupTracker.tracked_group_ids)
+      Group.preload_custom_fields(tracked_groups, Group.preloaded_custom_field_names)
+      ActiveModel::ArraySerializer.new(tracked_groups, each_serializer: TrackedGroupSerializer)
+    end
+  end
+
+  add_model_callback(Group, :after_save) do
+    ApplicationSerializer.expire_cache_fragment!(TRACKED_GROUPS)
+  end
+
+  add_model_callback(Group, :after_destroy) do
+    ApplicationSerializer.expire_cache_fragment!(TRACKED_GROUPS)
+  end
+
+  add_preloaded_topic_list_custom_field(GroupTracker::TRACKED_POSTS)
+  register_topic_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
+
+  add_to_serializer(:topic_list_item, :first_tracked_post) do
+    object.custom_fields[GroupTracker::TRACKED_POSTS]
+  end
+
+  add_to_serializer(:topic_list_item, :include_first_tracked_post?) do
+    object.custom_fields[GroupTracker::TRACKED_POSTS].present?
+  end
+
+  topic_view_post_custom_fields_whitelister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
+
+  add_to_serializer(:topic_view, :first_tracked_post) do
+    object.topic.custom_fields[GroupTracker::TRACKED_POSTS]
+  end
+
+  add_to_serializer(:topic_view, :include_first_tracked_post?) do
+    object.topic.custom_fields[GroupTracker::TRACKED_POSTS].present?
+  end
+
+  add_to_serializer(:topic_view, :tracked_posts) do
+    tracked_posts = [object.topic.custom_fields[GroupTracker::TRACKED_POSTS]]
+
+    object.post_custom_fields.keys.sort.each do |post_id|
+      if object.post_custom_fields[post_id][GroupTracker::TRACKED_POSTS]
+        tracked_posts << object.post_custom_fields[post_id][GroupTracker::TRACKED_POSTS]
+      end
+    end
+
+    tracked_posts
+  end
+
+  add_to_serializer(:post, :next_tracked_post) do
+    post_custom_fields[GroupTracker::TRACKED_POSTS]
+  end
+
+  add_to_serializer(:post, :include_next_tracked_post?) do
+    post_custom_fields[GroupTracker::TRACKED_POSTS].present?
+  end
+
+  register_post_custom_field_type(GroupTracker::OPTED_OUT, :boolean)
+  register_post_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
+
+  add_to_serializer(:post, :opted_out) do
+    post_custom_fields[GroupTracker::OPTED_OUT]
+  end
+
+  add_to_serializer(:post, :include_opted_out?) do
+    post_custom_fields[GroupTracker::OPTED_OUT]
+  end
+
+  add_permitted_post_create_param("opted_out")
+
+  on(:post_created) do |post, opts|
+    next unless GroupTracker.should_track?(post)
+
+    if opts["opted_out"]
+      post.custom_fields[GroupTracker::OPTED_OUT] = true
+      post.save_custom_fields(true)
+    else
+      GroupTracker.update_tracking!(post.topic_id)
+    end
+
+    nil
+  end
+
+  on(:post_edited) do |post|
+    next unless post.archetype != Archetype.private_message
+
+    # we're only concerned when there was an ownwership change
+    next unless user_ids = post.previous_changes["user_id"]
+    # and only if a human was concerned
+    next unless user_ids.any? { |id| id > 0 }
+
+    primary_group_ids = User.where(id: user_ids).pluck(:primary_group_id)
+
+    next unless (GroupTracker.tracked_group_ids & primary_group_ids).present?
+
+    GroupTracker.update_tracking!(post.topic_id)
+
+    nil
+  end
+
+  on(:post_moved) do |post, previous_topic_id|
+    next unless GroupTracker.should_track?(post)
+
+    GroupTracker.update_tracking!(post.topic_id)
+    GroupTracker.update_tracking!(previous_topic_id)
+
+    nil
+  end
+
+  on(:post_destroyed) do |post|
+    next unless GroupTracker.should_track?(post)
+
+    GroupTracker.update_tracking!(post.topic_id)
+
+    nil
+  end
+
+  on(:user_updated) do |user|
+    # we only care when the primary_group_id has changed...
+    next unless primary_group_ids = user.previous_changes["primary_group_id"]
+    # ... and only if either is tracked
+    next unless (GroupTracker.tracked_group_ids & primary_group_ids).present?
+
+    GroupTracker.update_tracking!
+
+    nil
+  end
+
+end

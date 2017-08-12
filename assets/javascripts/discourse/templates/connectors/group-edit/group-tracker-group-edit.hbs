@@ -1,0 +1,44 @@
+<div class="control-group">
+  {{d-checkbox label="group_tracker.track_posts"
+               checked=group.track_posts
+               change="toggleTrackPosts"}}
+</div>
+
+<div class="control-group">
+  {{d-checkbox label="group_tracker.add_to_navigation_bar"
+               checked=group.add_to_navigation_bar
+               change="toggleAddToNavigationBar"
+               disabled=(if group.track_posts false true)}}
+</div>
+
+{{!--
+
+<div class="control-group">
+  {{d-checkbox label="group_tracker.add_link_in_topics_list"
+               checked=group.add_link_in_topics_list
+               change="toggleAddLinkInTopicsList"
+               disabled=(if group.track_posts false true)}}
+</div>
+
+<div class="control-group">
+  {{d-checkbox label="group_tracker.add_next_button_on_post"
+               checked=group.add_next_button_on_post
+               change="toggleAddNextButtonOnPost"
+               disabled=(if group.track_posts false true)}}
+</div>
+
+<div class="control-group">
+  {{d-checkbox label="group_tracker.add_first_button_above_timeline"
+               checked=group.add_first_button_above_timeline
+               change="toggleAddFirstButtonAboveTimeline"
+               disabled=(if group.track_posts false true)}}
+</div>
+
+<div class="control-group">
+  {{d-checkbox label="group_tracker.add_next_button_below_timeline"
+               checked=group.add_next_button_below_timeline
+               change="toggleAddNextButtonBelowTimeline"
+               disabled=(if group.track_posts false true)}}
+</div>
+
+--}}
