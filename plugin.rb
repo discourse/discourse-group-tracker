@@ -57,7 +57,7 @@ after_initialize do
     cache_fragment(TRACKED_GROUPS) do
       tracked_groups = Group.where(id: GroupTracker.tracked_group_ids)
       Group.preload_custom_fields(tracked_groups, Group.preloaded_custom_field_names)
-      ActiveModel::ArraySerializer.new(tracked_groups, each_serializer: TrackedGroupSerializer)
+      ActiveModel::ArraySerializer.new(tracked_groups, each_serializer: TrackedGroupSerializer).as_json
     end
   end
 
