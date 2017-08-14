@@ -1,0 +1,7 @@
+plugins:
+  group_tracker_custom_icon:
+    client: true
+    default: ""
+  group_tracker_custom_icon_class:
+    client: true
+    default: ""

@@ -1,7 +1,14 @@
-{{#if context.topic.first_tracked_post}}
-  <span class="first-tracked-post group-{{context.topic.first_tracked_post.group}}">
-    <a href="{{context.topic.url}}/{{context.topic.first_tracked_post.post_number}}" title="{{i18n "group_tracker.first_group_post" group=context.topic.first_tracked_post.group}}">
-      {{d-icon 'arrow-circle-right'}}
+<span class="topic-icon-container">
+  {{#if context.topic.first_tracked_post}}
+    <a class="tracked-post group-{{context.topic.first_tracked_post.group}}" href="{{context.topic.url}}/{{context.topic.first_tracked_post.post_number}}" title="{{i18n "group_tracker.first_group_post" group=context.topic.first_tracked_post.group}}">
+      {{d-icon 'arrow-circle-right' class="first-tracked-post"}}
+      {{#if context.siteSettings.group_tracker_custom_icon}}
+        {{d-icon context.siteSettings.group_tracker_custom_icon class=context.siteSettings.group_tracker_custom_icon_class}}
+      {{/if}}
     </a>
-  </span>
-{{/if}}
+  {{else}}
+    {{#if context.siteSettings.group_tracker_custom_icon}}
+      {{d-icon context.siteSettings.group_tracker_custom_icon class=context.siteSettings.group_tracker_custom_icon_class}}
+    {{/if}}
+  {{/if}}
+</span>
