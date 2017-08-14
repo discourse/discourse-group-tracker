@@ -20,7 +20,7 @@ after_initialize do
     add_preloaded_group_custom_field(GroupTracker.key(attribute))
     register_group_custom_field_type(GroupTracker.key(attribute), :boolean)
 
-    add_to_serializer(:basic_group, attribute.to_sym) do
+    add_to_serializer(:basic_group, attribute.to_sym, false) do
       object.custom_fields[GroupTracker.key(attribute)]
     end
 
@@ -72,7 +72,7 @@ after_initialize do
   add_preloaded_topic_list_custom_field(GroupTracker::TRACKED_POSTS)
   register_topic_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
 
-  add_to_serializer(:topic_list_item, :first_tracked_post) do
+  add_to_serializer(:topic_list_item, :first_tracked_post, false) do
     object.custom_fields[GroupTracker::TRACKED_POSTS]
   end
 
@@ -82,7 +82,7 @@ after_initialize do
 
   topic_view_post_custom_fields_whitelister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
 
-  add_to_serializer(:topic_view, :first_tracked_post) do
+  add_to_serializer(:topic_view, :first_tracked_post, false) do
     object.topic.custom_fields[GroupTracker::TRACKED_POSTS]
   end
 
@@ -90,8 +90,10 @@ after_initialize do
     object.topic.custom_fields[GroupTracker::TRACKED_POSTS].present?
   end
 
-  add_to_serializer(:topic_view, :tracked_posts) do
-    tracked_posts = [object.topic.custom_fields[GroupTracker::TRACKED_POSTS]]
+  add_to_serializer(:topic_view, :tracked_posts, false) do
+    tracked_posts = []
+
+    tracked_posts << object.topic.custom_fields[GroupTracker::TRACKED_POSTS]
 
     object.post_custom_fields.keys.sort.each do |post_id|
       if object.post_custom_fields[post_id][GroupTracker::TRACKED_POSTS]
@@ -99,10 +101,14 @@ after_initialize do
       end
     end
 
-    tracked_posts
+    tracked_posts.compact
   end
 
-  add_to_serializer(:post, :next_tracked_post) do
+  add_to_serializer(:topic_view, :include_tracked_posts?) do
+    object.topic.custom_fields[GroupTracker::TRACKED_POSTS].present?
+  end
+
+  add_to_serializer(:post, :next_tracked_post, false) do
     post_custom_fields[GroupTracker::TRACKED_POSTS]
   end
 
@@ -113,7 +119,7 @@ after_initialize do
   register_post_custom_field_type(GroupTracker::OPTED_OUT, :boolean)
   register_post_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
 
-  add_to_serializer(:post, :opted_out) do
+  add_to_serializer(:post, :opted_out, false) do
     post_custom_fields[GroupTracker::OPTED_OUT]
   end
 
