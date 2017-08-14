@@ -7,7 +7,6 @@ after_initialize do
 
   load File.expand_path("../lib/group_tracker.rb", __FILE__)
   load File.expand_path("../app/serializers/tracked_group_serializer.rb", __FILE__)
-  load File.expand_path("../app/controllers/admin/groups_controller.rb", __FILE__)
 
   Discourse::Application.routes.append do
     namespace :admin, constraints: AdminConstraint.new do
@@ -27,6 +26,28 @@ after_initialize do
 
     add_to_serializer(:basic_group, "include_#{attribute}?".to_sym) do
       object.custom_fields[GroupTracker::TRACK_POSTS]
+    end
+  end
+
+  add_to_class(Admin::GroupsController, :toggle_track_posts) do
+    track_posts = params[:track_posts] == "true"
+
+    group = Group.find(params[:id])
+    group.custom_fields[GroupTracker.key("track_posts")] = track_posts
+    group.save
+
+    GroupTracker.update_tracking!
+
+    render json: success_json
+  end
+
+  (GroupTracker::GROUP_ATTRIBUTES - ["track_posts"]).each do |action|
+    add_to_class(Admin::GroupsController, :"toggle_#{action}") do
+      group = Group.find(params[:id])
+      group.custom_fields[GroupTracker.key(action)] = params[action.to_sym] == "true"
+      group.save
+
+      render json: success_json
     end
   end
 
