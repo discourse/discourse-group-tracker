@@ -10,15 +10,17 @@ after_initialize do
 
   Discourse::Application.routes.append do
     namespace :admin, constraints: AdminConstraint.new do
-      GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
-        put "groups/:id/toggle_#{attribute}" => "groups#toggle_#{attribute}", constraints: { id: /\d+/ }
-      end
+      put "groups/:id/track_posts" => "groups#update_track_posts", constraints: { id: /\d+/ }
+      put "groups/:id/add_to_navigation_bar" => "groups#update_add_to_navigation_bar", constraints: { id: /\d+/ }
+      put "groups/:id/tracked_post_icon" => "groups#update_tracked_post_icon", constraints: { id: /\d+/ }
     end
   end
 
+  register_group_custom_field_type(GroupTracker.key("track_posts"), :boolean)
+  register_group_custom_field_type(GroupTracker.key("add_to_navigation_bar"), :boolean)
+
   GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
     add_preloaded_group_custom_field(GroupTracker.key(attribute))
-    register_group_custom_field_type(GroupTracker.key(attribute), :boolean)
 
     add_to_serializer(:basic_group, attribute.to_sym, false) do
       object.custom_fields[GroupTracker.key(attribute)]
@@ -29,7 +31,7 @@ after_initialize do
     end
   end
 
-  add_to_class(Admin::GroupsController, :toggle_track_posts) do
+  add_to_class(Admin::GroupsController, :update_track_posts) do
     track_posts = params[:track_posts] == "true"
 
     group = Group.find(params[:id])
@@ -41,14 +43,20 @@ after_initialize do
     render json: success_json
   end
 
-  (GroupTracker::GROUP_ATTRIBUTES - ["track_posts"]).each do |action|
-    add_to_class(Admin::GroupsController, :"toggle_#{action}") do
-      group = Group.find(params[:id])
-      group.custom_fields[GroupTracker.key(action)] = params[action.to_sym] == "true"
-      group.save
+  add_to_class(Admin::GroupsController, :update_add_to_navigation_bar) do
+    group = Group.find(params[:id])
+    group.custom_fields[GroupTracker.key("add_to_navigation_bar")] = params[:add_to_navigation_bar] == "true"
+    group.save
 
-      render json: success_json
-    end
+    render json: success_json
+  end
+
+  add_to_class(Admin::GroupsController, :update_tracked_post_icon) do
+    group = Group.find(params[:id])
+    group.custom_fields[GroupTracker.key("tracked_post_icon")] = params[:tracked_post_icon].presence
+    group.save
+
+    render json: success_json
   end
 
   TRACKED_GROUPS ||= "tracked_groups".freeze

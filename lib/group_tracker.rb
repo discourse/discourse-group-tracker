@@ -3,10 +3,7 @@ module GroupTracker
   GROUP_ATTRIBUTES ||= %w{
     track_posts
     add_to_navigation_bar
-    add_link_in_topics_list
-    add_first_button_above_timeline
-    add_next_button_below_timeline
-    add_next_button_on_post
+    tracked_post_icon
   }
 
   def self.key(name)

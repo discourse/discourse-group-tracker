@@ -2,6 +2,17 @@ import { withPluginApi } from "discourse/lib/plugin-api";
 import { iconNode } from "discourse-common/lib/icon-library";
 import computed from "ember-addons/ember-computed-decorators";
 import Composer from "discourse/models/composer";
+import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
+
+function modifyTopicModel(api) {
+  api.modifyClass("model:topic", {
+    // used in the 'topic-list-before-status' connector
+    @computed("first_tracked_post.group")
+    firstTrackedPostIcon(group) {
+      return groupTrackerIcon(group, this.site, this.siteSettings);
+    }
+  });
+}
 
 function addNavigationBarItems(api) {
   const { tracked_groups } = api.container.lookup("site:main");
@@ -64,10 +75,13 @@ function addControlBelowTimeline(api) {
 
   api.decorateWidget("timeline-footer-controls:after", helper => {
     const { topic } = helper.attrs;
-    if (getNextTrackedPost(topic)) {
+    const { site, siteSettings } = helper.widget;
+    const nextTrackedPost = getNextTrackedPost(topic);
+
+    if (nextTrackedPost) {
       return helper.attach("button", {
         className: "next-tracked-post",
-        icon: "arrow-circle-right",
+        icon: groupTrackerIcon(nextTrackedPost.group, site, siteSettings),
         title: "group_tracker.next_post",
         action: "jumpToNextTrackedPost",
       });
@@ -78,6 +92,7 @@ function addControlBelowTimeline(api) {
     jumpToNextTrackedPost() {
       const { topic } = this.attrs;
       const nextTrackedPost = getNextTrackedPost(topic);
+
       if (nextTrackedPost) {
         topicController.send("jumpToPost", nextTrackedPost.post_number);
       }
@@ -90,6 +105,8 @@ function addNextTrackedPostButton(api) {
 
   api.decorateWidget("post-meta-data:after", helper => {
     const { topicUrl, next_tracked_post } = helper.attrs;
+    const { site, siteSettings } = helper.widget;
+
     if (next_tracked_post) {
       return helper.h(`div.next-tracked-post.group-${next_tracked_post.group}`,
         helper.h("a.tracked-post", {
@@ -97,7 +114,7 @@ function addNextTrackedPostButton(api) {
             href: Discourse.getURL(`${topicUrl}/${next_tracked_post.post_number}`),
             title: I18n.t("group_tracker.next_group_post", { group: next_tracked_post.group }),
           }
-        }, iconNode("arrow-circle-right"))
+        }, iconNode(groupTrackerIcon(next_tracked_post.group, site, siteSettings)))
       );
     }
   });
@@ -163,6 +180,8 @@ export default {
 
   initialize() {
     withPluginApi("0.8.9", api => {
+      modifyTopicModel(api);
+
       addNavigationBarItems(api);
 
       addControlAboveTimeline(api);

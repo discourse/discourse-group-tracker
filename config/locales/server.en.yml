@@ -1,4 +1,5 @@
 en:
   site_settings:
-    group_tracker_custom_icon: "Name of the icon used in the topics list."
-    group_tracker_custom_icon_class: "Class of the icon used in the topics list."
+    group_tracker_default_icon: "Name of the icon used by default."
+    group_tracker_topic_icon: "Name of the icon used in the topics list."
+    group_tracker_topic_icon_class: "Class of the icon used in the topics list."

@@ -3,10 +3,10 @@ en:
     group_tracker:
       track_posts: "Track posts made by members of this group"
       add_to_navigation_bar: "Add to navigation bar"
-      add_link_in_topics_list: "Add link to first post in topics list"
-      add_first_button_above_timeline: "Add first button above the timeline"
-      add_next_button_below_timeline: "Add next button below the timeline"
-      add_next_button_on_post: "Add next button on tracked posts"
+
+      tracked_post_icon:
+        label: "Icon used for tracked posts"
+        placeholder: "arrow-circle-right"
 
       opt_out:
         title: "Toggle Tracking"
