@@ -22,10 +22,8 @@ after_initialize do
   GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
     add_preloaded_group_custom_field(GroupTracker.key(attribute))
 
-    # GroupShowSerializer extends BasicGroup but if we add methods to a base
-    # class after its been extended the parent does not pick up the changes.
-    # This confusingly works in development where reloading works, but not
-    # production.
+    # GroupShowSerializer extends BasicGroup but in production mode the
+    # child doesn't pick up the parent's changes.
     [:basic_group, :group_show].each do |s|
       add_to_serializer(s, attribute.to_sym, false) do
         object.custom_fields[GroupTracker.key(attribute)]
