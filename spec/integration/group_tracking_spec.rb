@@ -28,14 +28,19 @@ describe "Group Tracking" do
       post3 = Fabricate(:post, topic: topic, user: member2)
 
       sign_in(admin)
-      xhr :put, "/admin/groups/#{group.id}/toggle_track_posts", track_posts: "true"
+
+      put "/admin/groups/#{group.id}/track_posts.json", params: {
+        track_posts: "true"
+      }
 
       expect(group.reload.custom_fields[GroupTracker::TRACK_POSTS]).to eq(true)
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => group.name, "post_number" => 1)
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => group.name, "post_number" => 3)
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-      xhr :put, "/admin/groups/#{group.id}/toggle_track_posts", track_posts: "false"
+      put "/admin/groups/#{group.id}/track_posts.json", params: {
+        track_posts: "false"
+      }
 
       expect(group.reload.custom_fields[GroupTracker::TRACK_POSTS]).to eq(false)
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
@@ -51,22 +56,22 @@ describe "Group Tracking" do
 
     it "inserts tracking data" do
       sign_in(user)
-      xhr :post, "/posts", title: "Topic with tracked posts", raw: raw
+      post "/posts.json", params: { title: "Topic with tracked posts", raw: raw }
 
       topic = Topic.last
 
       sign_in(member1)
-      xhr :post, "/posts", topic_id: topic.id, raw: raw
+      post "/posts.json", params: { topic_id: topic.id, raw: raw }
 
       sign_in(user)
-      xhr :post, "/posts", topic_id: topic.id, raw: raw
+      post "/posts.json", params: { topic_id: topic.id, raw: raw }
 
       # we can even opt out of tracking
       sign_in(member2)
-      xhr :post, "/posts", topic_id: topic.id, raw: raw, opted_out: "true"
+      post "/posts.json", params: { topic_id: topic.id, raw: raw, opted_out: "true" }
 
       sign_in(member1)
-      xhr :post, "/posts", topic_id: topic.id, raw: raw
+      post "/posts.json", params: { topic_id: topic.id, raw: raw }
 
       topic.reload
 
@@ -92,9 +97,14 @@ describe "Group Tracking" do
       sign_in(admin)
 
       # from a normal user to a tracked user
-      xhr :post, "/t/#{topic.id}/change-owner", post_ids: [post1.id], username: member2.username
+      post "/t/#{topic.id}/change-owner.json", params: {
+        post_ids: [post1.id], username: member2.username
+      }
+
       # from a tracked user to a normal user
-      xhr :post, "/t/#{topic.id}/change-owner", post_ids: [post3.id], username: user.username
+      post "/t/#{topic.id}/change-owner.json", params: {
+        post_ids: [post3.id], username: user.username
+      }
 
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 1)
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 2)
@@ -113,7 +123,9 @@ describe "Group Tracking" do
       post3 = Fabricate(:post, topic: topic, user: member2)
 
       sign_in(admin)
-      xhr :post, "/t/#{topic.id}/move-posts", post_ids: [post2.id], title: "This is a valid destination topic title"
+      post "/t/#{topic.id}/move-posts.json", params: {
+        post_ids: [post2.id], title: "This is a valid destination topic title"
+      }
 
       destination_topic = Topic.last
 
@@ -136,7 +148,7 @@ describe "Group Tracking" do
       post3 = Fabricate(:post, topic: topic, user: member2)
 
       sign_in(admin)
-      xhr :delete, "/posts/#{post2.id}"
+      delete "/posts/#{post2.id}.json"
 
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 3)
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
@@ -165,7 +177,9 @@ describe "Group Tracking" do
 
       sign_in(admin)
 
-      xhr :put, "/admin/users/#{user.id}/primary_group", primary_group_id: tracked_group.id
+      put "/admin/users/#{user.id}/primary_group.json", params: {
+        primary_group_id: tracked_group.id
+      }
 
       expect(topic1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 1)
       expect(post1_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 3)
@@ -178,7 +192,7 @@ describe "Group Tracking" do
       expect(post2_3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 4)
       expect(post2_4.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-      xhr :put, "/admin/users/#{member1.id}/primary_group"
+      put "/admin/users/#{member1.id}/primary_group.json"
 
       expect(topic2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 2)
       expect(post2_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
