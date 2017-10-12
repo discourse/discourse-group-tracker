@@ -14,6 +14,21 @@ function modifyTopicModel(api) {
   });
 }
 
+function addTrackedGroupToTopicList(api) {
+  api.modifyClass('component:topic-list-item', {
+    @computed('topic.first_tracked_post')
+    unboundClassNames(firstTrackedPost) {
+      let classNames = this._super();
+
+      if (firstTrackedPost) {
+        classNames += ` group-${firstTrackedPost.group}`;
+      }
+
+      return classNames;
+    }
+  });
+}
+
 function addNavigationBarItems(api) {
   const { tracked_groups } = api.container.lookup("site:main");
 
@@ -191,6 +206,7 @@ export default {
 
       addOptOutClassOnPost(api);
       addOptOutToggle(api);
+      addTrackedGroupToTopicList(api);
     });
   }
 };
