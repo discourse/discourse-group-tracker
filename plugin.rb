@@ -188,15 +188,14 @@ after_initialize do
     nil
   end
 
-  on(:user_updated) do |user|
+  add_model_callback(User, :after_commit, on: :update) do
     # we only care when the primary_group_id has changed...
-    next unless primary_group_ids = user.previous_changes["primary_group_id"]
+    next unless primary_group_ids = self.previous_changes["primary_group_id"]
+
     # ... and only if either is tracked
     next unless (GroupTracker.tracked_group_ids & primary_group_ids).present?
 
     GroupTracker.update_tracking!
-
-    nil
   end
 
 end
