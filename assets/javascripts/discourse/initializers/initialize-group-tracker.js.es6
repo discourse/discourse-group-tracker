@@ -43,6 +43,7 @@ function addNavigationBarItems(api) {
         title: g.full_name,
         classNames: `group-${g.name}`,
         href: Discourse.getURL(`/groups/${g.name}/activity/posts`),
+        includeCategoryId: true
       });
     });
 }
