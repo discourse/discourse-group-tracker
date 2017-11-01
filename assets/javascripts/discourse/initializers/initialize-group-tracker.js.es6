@@ -37,13 +37,15 @@ function addNavigationBarItems(api) {
   tracked_groups
     .filter(g => g.add_to_navigation_bar)
     .forEach(g => {
+      let groupId = `group-${g.name}`;
       api.addNavigationBarItem({
         name: g.name,
         displayName: g.full_name,
         title: g.full_name,
-        classNames: `group-${g.name}`,
+        classNames: groupId,
         href: Discourse.getURL(`/groups/${g.name}/activity/posts`),
-        includeCategoryId: true
+        filterMode: groupId,
+        includeCategoryId: true,
       });
     });
 }
