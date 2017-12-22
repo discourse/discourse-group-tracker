@@ -121,9 +121,11 @@ function addControlBelowTimeline(api) {
 function addNextTrackedPostButton(api) {
   api.includePostAttributes("next_tracked_post");
 
-  api.decorateWidget("post-meta-data:after", helper => {
+  let site = api.container.lookup('site:main');
+  let insertLoc = site.mobileView ? 'post-avatar:after' : 'post-meta-data:after';
+  api.decorateWidget(insertLoc, helper => {
     const { topicUrl, next_tracked_post } = helper.attrs;
-    const { site, siteSettings } = helper.widget;
+    const { siteSettings } = helper.widget;
 
     if (next_tracked_post) {
       return helper.h(`div.next-tracked-post.group-${next_tracked_post.group}`,
