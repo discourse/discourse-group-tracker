@@ -34,8 +34,8 @@ module GroupTracker
 
   private
 
-    def self.update_tracking_on_topics!(topic_id = nil)
-      builder = SqlBuilder.new <<-SQL.strip_heredoc
+  def self.update_tracking_on_topics!(topic_id = nil)
+    builder = SqlBuilder.new <<-SQL.strip_heredoc
         WITH "tracked_posts" AS (
             SELECT p.topic_id
                  , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
@@ -73,7 +73,7 @@ module GroupTracker
            AND td.topic_id NOT IN (SELECT topic_id FROM "topic_custom_fields" WHERE name = :custom_field_name)
       SQL
 
-      builder.where <<-SQL.strip_heredoc.squish
+    builder.where <<-SQL.strip_heredoc.squish
         p.post_type = 1
         AND p.deleted_at IS NULL
         AND t.archetype = 'regular'
@@ -83,24 +83,24 @@ module GroupTracker
         AND (pcf.value IS NULL OR pcf.value <> 't')
       SQL
 
-      builder.where2("name = :custom_field_name")
+    builder.where2("name = :custom_field_name")
 
-      if topic_id
-        builder.where("p.topic_id = :topic_id", topic_id: topic_id)
-        builder.where2("'f'")
-      else
-        builder.where2("topic_id NOT IN (SELECT topic_id FROM tracked_data)")
-      end
-
-      builder.exec(
-        tracked_group_ids: tracked_group_ids,
-        opted_out_name: key("opted_out"),
-        custom_field_name: key("tracked_posts"),
-      )
+    if topic_id
+      builder.where("p.topic_id = :topic_id", topic_id: topic_id)
+      builder.where2("'f'")
+    else
+      builder.where2("topic_id NOT IN (SELECT topic_id FROM tracked_data)")
     end
 
-    def self.update_tracking_posts!(topic_id = nil)
-      builder = SqlBuilder.new <<-SQL.strip_heredoc
+    builder.exec(
+      tracked_group_ids: tracked_group_ids,
+      opted_out_name: key("opted_out"),
+      custom_field_name: key("tracked_posts"),
+    )
+  end
+
+  def self.update_tracking_posts!(topic_id = nil)
+    builder = SqlBuilder.new <<-SQL.strip_heredoc
         WITH "tracked_posts" AS (
             SELECT p.topic_id
                  , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
@@ -140,7 +140,7 @@ module GroupTracker
            AND td.post_id NOT IN (SELECT post_id FROM "post_custom_fields" WHERE name = :custom_field_name)
       SQL
 
-      builder.where <<-SQL.strip_heredoc
+    builder.where <<-SQL.strip_heredoc
         p.post_type = 1
         AND p.deleted_at IS NULL
         AND t.archetype = 'regular'
@@ -150,19 +150,19 @@ module GroupTracker
         AND (pcf.value IS NULL OR pcf.value <> 't')
       SQL
 
-      builder.where2("name = :custom_field_name")
-      builder.where2("post_id NOT IN (SELECT post_id FROM tracked_data)")
+    builder.where2("name = :custom_field_name")
+    builder.where2("post_id NOT IN (SELECT post_id FROM tracked_data)")
 
-      if topic_id
-        builder.where("p.topic_id = :topic_id", topic_id: topic_id)
-        builder.where2("post_id IN (SELECT id FROM posts WHERE topic_id = :topic_id)")
-      end
-
-      builder.exec(
-        tracked_group_ids: tracked_group_ids,
-        opted_out_name: key("opted_out"),
-        custom_field_name: key("tracked_posts"),
-      )
+    if topic_id
+      builder.where("p.topic_id = :topic_id", topic_id: topic_id)
+      builder.where2("post_id IN (SELECT id FROM posts WHERE topic_id = :topic_id)")
     end
+
+    builder.exec(
+      tracked_group_ids: tracked_group_ids,
+      opted_out_name: key("opted_out"),
+      custom_field_name: key("tracked_posts"),
+    )
+  end
 
 end
