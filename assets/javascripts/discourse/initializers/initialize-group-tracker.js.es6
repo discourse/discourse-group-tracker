@@ -122,8 +122,7 @@ function addNextTrackedPostButton(api) {
   api.includePostAttributes("next_tracked_post");
 
   let site = api.container.lookup('site:main');
-  let insertLoc = site.mobileView ? 'post-avatar:after' : 'post-meta-data:after';
-  api.decorateWidget(insertLoc, helper => {
+  api.decorateWidget('post-meta-data:after', helper => {
     const { topicUrl, next_tracked_post } = helper.attrs;
     const { siteSettings } = helper.widget;
 
