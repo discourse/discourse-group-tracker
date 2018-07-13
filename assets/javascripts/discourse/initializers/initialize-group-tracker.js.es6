@@ -89,10 +89,18 @@ function addControlBelowTimeline(api) {
   });
 
   function getNextTrackedPost(topic) {
+    const postStream = topic.get("postStream");
+    const stream = postStream.get("stream");
+
     return (
       topic &&
       topic.tracked_posts &&
-      topic.tracked_posts.find(p => p.post_number > currentPostNumber)
+      topic.tracked_posts.find(p => {
+        return (
+          p.post_number > currentPostNumber &&
+          stream.includes(postStream.findPostIdForPostNumber(p.post_number))
+        );
+      })
     );
   }
 
