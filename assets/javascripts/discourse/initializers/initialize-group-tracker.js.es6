@@ -15,8 +15,8 @@ function modifyTopicModel(api) {
 }
 
 function addTrackedGroupToTopicList(api) {
-  api.modifyClass('component:topic-list-item', {
-    @computed('topic.first_tracked_post')
+  api.modifyClass("component:topic-list-item", {
+    @computed("topic.first_tracked_post")
     unboundClassNames(firstTrackedPost) {
       let classNames = this._super();
 
@@ -32,22 +32,22 @@ function addTrackedGroupToTopicList(api) {
 function addNavigationBarItems(api) {
   const { tracked_groups } = api.container.lookup("site:main");
 
-  if (!tracked_groups) { return; }
+  if (!tracked_groups) {
+    return;
+  }
 
-  tracked_groups
-    .filter(g => g.add_to_navigation_bar)
-    .forEach(g => {
-      let groupId = `group-${g.name}`;
-      api.addNavigationBarItem({
-        name: g.name,
-        displayName: g.full_name,
-        title: g.full_name,
-        classNames: groupId,
-        href: Discourse.getURL(`/groups/${g.name}/activity/posts`),
-        filterMode: groupId,
-        includeCategoryId: true,
-      });
+  tracked_groups.filter(g => g.add_to_navigation_bar).forEach(g => {
+    let groupId = `group-${g.name}`;
+    api.addNavigationBarItem({
+      name: g.name,
+      displayName: g.full_name,
+      title: g.full_name,
+      classNames: groupId,
+      href: Discourse.getURL(`/groups/${g.name}/activity/posts`),
+      filterMode: groupId,
+      includeCategoryId: true
     });
+  });
 }
 
 function addControlAboveTimeline(api) {
@@ -60,7 +60,7 @@ function addControlAboveTimeline(api) {
         className: "first-tracked-post",
         icon: "arrow-circle-up",
         title: "group_tracker.first_post",
-        action: "jumpToFirstTrackedPost",
+        action: "jumpToFirstTrackedPost"
       });
     }
   });
@@ -69,7 +69,10 @@ function addControlAboveTimeline(api) {
     jumpToFirstTrackedPost() {
       const { topic } = this.attrs;
       if (topic.first_tracked_post) {
-        topicController.send("jumpToPost", topic.first_tracked_post.post_number);
+        topicController.send(
+          "jumpToPost",
+          topic.first_tracked_post.post_number
+        );
       }
     }
   });
@@ -86,9 +89,11 @@ function addControlBelowTimeline(api) {
   });
 
   function getNextTrackedPost(topic) {
-    return topic &&
-           topic.tracked_posts &&
-           topic.tracked_posts.find(p => p.post_number > currentPostNumber);
+    return (
+      topic &&
+      topic.tracked_posts &&
+      topic.tracked_posts.find(p => p.post_number > currentPostNumber)
+    );
   }
 
   api.decorateWidget("timeline-footer-controls:after", helper => {
@@ -101,7 +106,7 @@ function addControlBelowTimeline(api) {
         className: "next-tracked-post",
         icon: groupTrackerIcon(nextTrackedPost.group, site, siteSettings),
         title: "group_tracker.next_post",
-        action: "jumpToNextTrackedPost",
+        action: "jumpToNextTrackedPost"
       });
     }
   });
@@ -121,19 +126,30 @@ function addControlBelowTimeline(api) {
 function addNextTrackedPostButton(api) {
   api.includePostAttributes("next_tracked_post");
 
-  let site = api.container.lookup('site:main');
-  api.decorateWidget('post-meta-data:after', helper => {
+  let site = api.container.lookup("site:main");
+  api.decorateWidget("post-meta-data:after", helper => {
     const { topicUrl, next_tracked_post } = helper.attrs;
     const { siteSettings } = helper.widget;
 
     if (next_tracked_post) {
-      return helper.h(`div.next-tracked-post.group-${next_tracked_post.group}`,
-        helper.h("a.tracked-post", {
-          attributes: {
-            href: Discourse.getURL(`${topicUrl}/${next_tracked_post.post_number}`),
-            title: I18n.t("group_tracker.next_group_post", { group: next_tracked_post.group }),
-          }
-        }, iconNode(groupTrackerIcon(next_tracked_post.group, site, siteSettings)))
+      return helper.h(
+        `div.next-tracked-post.group-${next_tracked_post.group}`,
+        helper.h(
+          "a.tracked-post",
+          {
+            attributes: {
+              href: Discourse.getURL(
+                `${topicUrl}/${next_tracked_post.post_number}`
+              ),
+              title: I18n.t("group_tracker.next_group_post", {
+                group: next_tracked_post.group
+              })
+            }
+          },
+          iconNode(
+            groupTrackerIcon(next_tracked_post.group, site, siteSettings)
+          )
+        )
       );
     }
   });
@@ -166,7 +182,11 @@ function addOptOutToggle(api) {
       if (!this.currentUser) return false;
       if (!this.currentUser.primary_group_id) return false;
       if (ALLOWED_COMPOSER_ACTIONS.indexOf(action) < 0) return false;
-      return this.site.tracked_groups.map(g => g.id).indexOf(this.currentUser.primary_group_id) >= 0;
+      return (
+        this.site.tracked_groups
+          .map(g => g.id)
+          .indexOf(this.currentUser.primary_group_id) >= 0
+      );
     },
 
     actions: {
@@ -190,7 +210,7 @@ function addOptOutToggle(api) {
     icon: "unlink",
     label: "group_tracker.opt_out.title",
     action: "togglePostTracking",
-    condition: "showOptOutToggle",
+    condition: "showOptOutToggle"
   }));
 }
 
