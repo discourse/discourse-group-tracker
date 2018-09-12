@@ -35,7 +35,7 @@ module GroupTracker
   private
 
   def self.update_tracking_on_topics!(topic_id = nil)
-    builder = SqlBuilder.new <<-SQL.strip_heredoc
+    builder = DB.build <<~SQL
         WITH "tracked_posts" AS (
             SELECT p.topic_id
                  , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
@@ -73,7 +73,7 @@ module GroupTracker
            AND td.topic_id NOT IN (SELECT topic_id FROM "topic_custom_fields" WHERE name = :custom_field_name)
       SQL
 
-    builder.where <<-SQL.strip_heredoc.squish
+    builder.where <<~SQL
         p.post_type = 1
         AND p.deleted_at IS NULL
         AND t.archetype = 'regular'
@@ -100,7 +100,7 @@ module GroupTracker
   end
 
   def self.update_tracking_posts!(topic_id = nil)
-    builder = SqlBuilder.new <<-SQL.strip_heredoc
+    builder = DB.build <<~SQL
         WITH "tracked_posts" AS (
             SELECT p.topic_id
                  , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
@@ -140,7 +140,7 @@ module GroupTracker
            AND td.post_id NOT IN (SELECT post_id FROM "post_custom_fields" WHERE name = :custom_field_name)
       SQL
 
-    builder.where <<-SQL.strip_heredoc
+    builder.where <<~SQL
         p.post_type = 1
         AND p.deleted_at IS NULL
         AND t.archetype = 'regular'
