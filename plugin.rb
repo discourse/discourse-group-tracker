@@ -19,6 +19,8 @@ after_initialize do
   register_group_custom_field_type(GroupTracker.key("track_posts"), :boolean)
   register_group_custom_field_type(GroupTracker.key("add_to_navigation_bar"), :boolean)
 
+  register_svg_icon 'arrow-circle-up' if respond_to?(:register_svg_icon)
+
   GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
     add_preloaded_group_custom_field(GroupTracker.key(attribute))
 
