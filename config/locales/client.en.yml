@@ -6,6 +6,7 @@ en:
 
       tracked_post_icon:
         label: "Icon used for tracked posts"
+        description: 'When using a FontAwesome icon not included in your subset, please add the icon name to the "svg icon subset" site setting as well.'
         placeholder: "arrow-circle-right"
 
       opt_out:
