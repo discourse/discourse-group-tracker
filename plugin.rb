@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # name: discourse-group-tracker
 # about: Group Tracker plugin for Discourse
 # version: 0.1

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TrackedGroupSerializer < ApplicationSerializer
   attributes :id,
              :name,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GroupTracker
 
   GROUP_ATTRIBUTES ||= %w{
