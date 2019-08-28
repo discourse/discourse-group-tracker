@@ -1,9 +1,12 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 # name: discourse-group-tracker
 # about: Group Tracker plugin for Discourse
 # version: 0.1
 # author: Régis Hanol
+
+register_asset 'stylesheets/group-tracker.scss'
 
 after_initialize do
 
@@ -22,6 +25,9 @@ after_initialize do
   register_group_custom_field_type(GroupTracker.key("add_to_navigation_bar"), :boolean)
 
   register_svg_icon 'arrow-circle-up' if respond_to?(:register_svg_icon)
+  register_svg_icon 'crown' if respond_to?(:register_svg_icon)
+  register_svg_icon 'arrow-right' if respond_to?(:register_svg_icon)
+  register_svg_icon 'arrow-left' if respond_to?(:register_svg_icon)
 
   GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
     add_preloaded_group_custom_field(GroupTracker.key(attribute))

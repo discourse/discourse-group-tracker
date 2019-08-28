@@ -16,4 +16,5 @@ en:
       first_group_post: "First %{group} post"
 
       next_post: "Next tracked post"
+      prev_post: "Previous tracked post"
       next_group_post: "Next %{group} post"
