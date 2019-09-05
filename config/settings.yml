@@ -1,7 +1,7 @@
 plugins:
   group_tracker_default_icon:
     client: true
-    default: "arrow-circle-right"
+    default: "crown"
   group_tracker_topic_icon:
     client: true
     default: ""

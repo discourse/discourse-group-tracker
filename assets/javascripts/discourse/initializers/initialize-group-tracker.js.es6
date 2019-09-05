@@ -50,8 +50,15 @@ function addNavigationBarItems(api) {
   });
 }
 
-function addControlAboveTimeline(api) {
+function addControlToTimeline(api) {
+  const appEvents = api.container.lookup("app-events:main");
   const topicController = api.container.lookup("controller:topic");
+
+  let currentPostNumber = 1;
+
+  appEvents.on("topic:current-post-changed", ({ post }) => {
+    currentPostNumber = post.post_number;
+  });
 
   api.decorateWidget("timeline-controls:before", helper => {
     const { topic } = helper.attrs;
@@ -60,7 +67,8 @@ function addControlAboveTimeline(api) {
         className: "first-tracked-post",
         icon: "arrow-circle-up",
         title: "group_tracker.first_post",
-        action: "jumpToFirstTrackedPost"
+        action: "jumpToFirstTrackedPost",
+        disabled: topic.first_tracked_post.post_number >= currentPostNumber
       });
     }
   });
@@ -76,17 +84,24 @@ function addControlAboveTimeline(api) {
       }
     }
   });
-}
 
-function addControlBelowTimeline(api) {
-  const appEvents = api.container.lookup("app-events:main");
-  const topicController = api.container.lookup("controller:topic");
+  function getPreviousTrackedPost(topic) {
+    const postStream = topic.get("postStream");
+    const stream = postStream.get("stream");
 
-  let currentPostNumber = 1;
-
-  appEvents.on("topic:current-post-changed", ({ post }) => {
-    currentPostNumber = post.post_number;
-  });
+    return (
+      topic &&
+      topic.tracked_posts &&
+      topic.tracked_posts
+        .filter(p => {
+          return (
+            p.post_number < currentPostNumber &&
+            stream.includes(postStream.findPostIdForPostNumber(p.post_number))
+          );
+        })
+        .pop()
+    );
+  }
 
   function getNextTrackedPost(topic) {
     const postStream = topic.get("postStream");
@@ -107,16 +122,33 @@ function addControlBelowTimeline(api) {
   api.decorateWidget("timeline-footer-controls:after", helper => {
     const { topic } = helper.attrs;
     const { site, siteSettings } = helper.widget;
-    const nextTrackedPost = getNextTrackedPost(topic);
+    const prevTrackedPost = getPreviousTrackedPost(topic);
+    const group = prevTrackedPost ? prevTrackedPost.group : null;
 
-    if (nextTrackedPost) {
-      return helper.attach("button", {
-        className: "next-tracked-post",
-        icon: groupTrackerIcon(nextTrackedPost.group, site, siteSettings),
-        title: "group_tracker.next_post",
-        action: "jumpToNextTrackedPost"
-      });
-    }
+    return helper.attach("button", {
+      className: "prev-tracked-post",
+      icon: groupTrackerIcon(group, site, siteSettings),
+      contents: iconNode("arrow-left"),
+      title: "group_tracker.prev_post",
+      action: "jumpToPrevTrackedPost",
+      disabled: group === null
+    });
+  });
+
+  api.decorateWidget("timeline-footer-controls:after", helper => {
+    const { topic } = helper.attrs;
+    const { site, siteSettings } = helper.widget;
+    const nextTrackedPost = getNextTrackedPost(topic);
+    const group = nextTrackedPost ? nextTrackedPost.group : null;
+
+    return helper.attach("button", {
+      className: "next-tracked-post",
+      icon: groupTrackerIcon(group, site, siteSettings),
+      contents: iconNode("arrow-right"),
+      title: "group_tracker.next_post",
+      action: "jumpToNextTrackedPost",
+      disabled: group === null
+    });
   });
 
   api.reopenWidget("timeline-footer-controls", {
@@ -127,38 +159,15 @@ function addControlBelowTimeline(api) {
       if (nextTrackedPost) {
         topicController.send("jumpToPost", nextTrackedPost.post_number);
       }
-    }
-  });
-}
+    },
 
-function addNextTrackedPostButton(api) {
-  api.includePostAttributes("next_tracked_post");
+    jumpToPrevTrackedPost() {
+      const { topic } = this.attrs;
+      const prevTrackedPost = getPreviousTrackedPost(topic);
 
-  let site = api.container.lookup("site:main");
-  api.decorateWidget("post-meta-data:after", helper => {
-    const { topicUrl, next_tracked_post } = helper.attrs;
-    const { siteSettings } = helper.widget;
-
-    if (next_tracked_post) {
-      return helper.h(
-        `div.next-tracked-post.group-${next_tracked_post.group}`,
-        helper.h(
-          "a.tracked-post",
-          {
-            attributes: {
-              href: Discourse.getURL(
-                `${topicUrl}/${next_tracked_post.post_number}`
-              ),
-              title: I18n.t("group_tracker.next_group_post", {
-                group: next_tracked_post.group
-              })
-            }
-          },
-          iconNode(
-            groupTrackerIcon(next_tracked_post.group, site, siteSettings)
-          )
-        )
-      );
+      if (prevTrackedPost) {
+        topicController.send("jumpToPost", prevTrackedPost.post_number);
+      }
     }
   });
 }
@@ -231,10 +240,7 @@ export default {
 
       addNavigationBarItems(api);
 
-      addControlAboveTimeline(api);
-      addControlBelowTimeline(api);
-
-      addNextTrackedPostButton(api);
+      addControlToTimeline(api);
 
       addOptOutClassOnPost(api);
       addOptOutToggle(api);

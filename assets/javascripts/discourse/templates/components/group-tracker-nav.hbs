@@ -1,0 +1,16 @@
+{{#d-button
+  action=(action "jumpToPrevTrackedPost")
+  class="btn-default group-tracker-jump-prev"
+  icon=prevTrackerIcon
+  disabled=prevTrackedPostDisabled
+}}
+  {{d-icon 'arrow-left'}}
+{{/d-button}}
+{{#d-button
+  action=(action "jumpToNextTrackedPost")
+  class="btn-default group-tracker-jump-next"
+  icon=nextTrackerIcon
+  disabled=nextTrackedPostDisabled
+}}
+  {{d-icon 'arrow-right'}}
+{{/d-button}}
