@@ -4,9 +4,10 @@
   "repository": "git@github.com:discourse/discourse-group-tracker.git",
   "author": "Discourse",
   "license": "MIT",
-  "devDependencies": {
-    "babel-eslint": "^8.2",
-    "eslint": "^4.19",
-    "prettier": "1.14.3"
+  "devDependencies": {},
+  "dependencies": {
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.5.1",
+    "prettier": "^1.18.2"
   }
 }
