@@ -13,7 +13,7 @@ hooks:
         cd: $home/plugins
         cmd:
           - mkdir -p plugins
-          - git clone https://github.com/discourse/discourse-adplugin.git
+          - git clone https://github.com/discourse/discourse-group-tracker.git
 ```
 Rebuild the container
 
