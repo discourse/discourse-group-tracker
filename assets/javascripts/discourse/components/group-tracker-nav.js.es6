@@ -1,4 +1,5 @@
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
+import DiscourseURL from "discourse/lib/url";
 import {
   default as computed,
   on

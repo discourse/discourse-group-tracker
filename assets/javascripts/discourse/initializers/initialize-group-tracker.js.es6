@@ -3,6 +3,7 @@ import { iconNode } from "discourse-common/lib/icon-library";
 import computed from "ember-addons/ember-computed-decorators";
 import Composer from "discourse/models/composer";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
+import DiscourseURL from "discourse/lib/url";
 
 function modifyTopicModel(api) {
   api.modifyClass("model:topic", {
