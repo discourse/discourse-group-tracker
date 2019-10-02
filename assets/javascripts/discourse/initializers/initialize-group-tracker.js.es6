@@ -157,7 +157,8 @@ function addControlToTimeline(api) {
       const nextTrackedPost = getNextTrackedPost(topic);
 
       if (nextTrackedPost) {
-        topicController.send("jumpToPost", nextTrackedPost.post_number);
+        const url = topic.url + "/" + nextTrackedPost.post_number;
+        DiscourseURL.routeTo(url);
       }
     },
 
@@ -166,7 +167,8 @@ function addControlToTimeline(api) {
       const prevTrackedPost = getPreviousTrackedPost(topic);
 
       if (prevTrackedPost) {
-        topicController.send("jumpToPost", prevTrackedPost.post_number);
+        const url = topic.url + "/" + prevTrackedPost.post_number;
+        DiscourseURL.routeTo(url);
       }
     }
   });

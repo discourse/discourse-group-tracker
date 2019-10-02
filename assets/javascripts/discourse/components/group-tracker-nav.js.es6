@@ -101,17 +101,21 @@ export default Ember.Component.extend({
 
   actions: {
     jumpToNextTrackedPost() {
+      const topic = this.topic;
       const nextTrackedPost = this.getNextTrackedPost(topic);
 
       if (nextTrackedPost) {
-        this.jumpToPost(nextTrackedPost.post_number);
+        const url = topic.url + "/" + nextTrackedPost.post_number;
+        DiscourseURL.routeTo(url);
       }
     },
     jumpToPrevTrackedPost() {
+      const topic = this.topic;
       const prevTrackedPost = this.getPreviousTrackedPost(topic);
 
       if (prevTrackedPost) {
-        this.jumpToPost(prevTrackedPost.post_number);
+        const url = topic.url + "/" + prevTrackedPost.post_number;
+        DiscourseURL.routeTo(url);
       }
     }
   }
