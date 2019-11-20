@@ -22,7 +22,7 @@ module GroupTracker
 
   def self.should_track?(post)
     post.user_id > 0 &&
-    post.post_type == Post.types[:regular] &&
+    (post.post_type == Post.types[:regular] || post.post_type == Post.types[:moderator_action]) &&
     post.archetype != Archetype.private_message &&
     tracked_group_ids.include?(post.user.primary_group_id)
   end

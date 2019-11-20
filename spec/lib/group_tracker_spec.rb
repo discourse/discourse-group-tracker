@@ -19,7 +19,7 @@ describe GroupTracker do
       expect(GroupTracker.should_track?(post)).to eq(false)
     end
 
-    Post.types.except(:regular).keys.each do |post_type|
+    Post.types.except(:regular, :moderator_action).keys.each do |post_type|
       it "does not track #{post_type} posts" do
         post = build(:post, user: human, post_type: post_type)
         expect(GroupTracker.should_track?(post)).to eq(false)
@@ -39,6 +39,9 @@ describe GroupTracker do
       expect(GroupTracker.should_track?(post)).to eq(false)
 
       post = build(:post, user: human)
+      expect(GroupTracker.should_track?(post)).to eq(true)
+
+      post = build(:post, user: human, post_type: Post.types[:moderator_action])
       expect(GroupTracker.should_track?(post)).to eq(true)
     end
 
