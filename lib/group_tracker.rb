@@ -76,7 +76,7 @@ module GroupTracker
       SQL
 
     builder.where <<~SQL
-        p.post_type = 1
+        p.post_type IN (1, 2)
         AND p.deleted_at IS NULL
         AND t.archetype = 'regular'
         AND t.deleted_at IS NULL
@@ -143,7 +143,7 @@ module GroupTracker
       SQL
 
     builder.where <<~SQL
-        p.post_type = 1
+        p.post_type IN (1, 2)
         AND p.deleted_at IS NULL
         AND t.archetype = 'regular'
         AND t.deleted_at IS NULL
