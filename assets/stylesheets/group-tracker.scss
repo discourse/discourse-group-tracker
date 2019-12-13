@@ -1,8 +1,12 @@
 .group-tracker-nav {
   background-color: $secondary;
   display: inline-flex;
+  height: 100%;
   .btn {
-    height: 43px;
     display: inline-flex;
   }
+}
+
+.group-tracker {
+  height: 100%;
 }
