@@ -84,6 +84,11 @@ export default Ember.Component.extend({
     return nextTrackedPostGroup === null;
   },
 
+  @computed("nextTrackedPostGroup", "prevTrackedPostGroup")
+  group_tracker_posts_exists(nextTrackedPostGroup, prevTrackedPostGroup) {
+    return nextTrackedPostGroup !== null || prevTrackedPostGroup !== null;
+  },
+
   @computed("topic", "currentPostNumber")
   prevTrackedPostGroup(topic) {
     const prevTrackedPost = this.getPreviousTrackedPost(topic);

@@ -123,8 +123,15 @@ function addControlToTimeline(api) {
   api.decorateWidget("timeline-footer-controls:after", helper => {
     const { topic } = helper.attrs;
     const { site, siteSettings } = helper.widget;
+    const nextTrackedPost = getNextTrackedPost(topic);
     const prevTrackedPost = getPreviousTrackedPost(topic);
     const group = prevTrackedPost ? prevTrackedPost.group : null;
+    const nextGroup = nextTrackedPost ? nextTrackedPost.group : null;
+
+    //if both buttons are disabled, do not display
+    if(group === null && nextGroup === null) {
+      return null;
+    }
 
     return helper.attach("button", {
       className: "prev-tracked-post",
@@ -140,7 +147,14 @@ function addControlToTimeline(api) {
     const { topic } = helper.attrs;
     const { site, siteSettings } = helper.widget;
     const nextTrackedPost = getNextTrackedPost(topic);
+    const prevTrackedPost = getPreviousTrackedPost(topic);
     const group = nextTrackedPost ? nextTrackedPost.group : null;
+    const prevGroup = prevTrackedPost ? prevTrackedPost.group : null;
+
+    //if both buttons are disabled, do not display
+    if(group === null && prevGroup === null) {
+      return null;
+    }
 
     return helper.attach("button", {
       className: "next-tracked-post",
