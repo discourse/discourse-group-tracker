@@ -37,18 +37,20 @@ function addNavigationBarItems(api) {
     return;
   }
 
-  tracked_groups.filter(g => g.add_to_navigation_bar).forEach(g => {
-    let groupId = `group-${g.name}`;
-    api.addNavigationBarItem({
-      name: g.name,
-      displayName: g.full_name,
-      title: g.full_name,
-      classNames: groupId,
-      href: Discourse.getURL(`/groups/${g.name}/activity/posts`),
-      filterMode: groupId,
-      includeCategoryId: true
+  tracked_groups
+    .filter(g => g.add_to_navigation_bar)
+    .forEach(g => {
+      let groupId = `group-${g.name}`;
+      api.addNavigationBarItem({
+        name: groupId,
+        displayName: g.full_name,
+        title: g.full_name,
+        classNames: groupId,
+        href: Discourse.getURL(`/g/${g.name}/activity/posts`),
+        filterMode: groupId,
+        includeCategoryId: true
+      });
     });
-  });
 }
 
 function addControlToTimeline(api) {
@@ -129,7 +131,7 @@ function addControlToTimeline(api) {
     const nextGroup = nextTrackedPost ? nextTrackedPost.group : null;
 
     //if both buttons are disabled, do not display
-    if(group === null && nextGroup === null) {
+    if (group === null && nextGroup === null) {
       return null;
     }
 
@@ -152,7 +154,7 @@ function addControlToTimeline(api) {
     const prevGroup = prevTrackedPost ? prevTrackedPost.group : null;
 
     //if both buttons are disabled, do not display
-    if(group === null && prevGroup === null) {
+    if (group === null && prevGroup === null) {
       return null;
     }
 
