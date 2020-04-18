@@ -204,10 +204,18 @@ function addOptOutToggle(api) {
   });
 
   api.modifyClass("model:composer", {
+    groupTrackerOptOut(opts) {
+      this.set("optedOut", opts.post && opts.post.opted_out);
+    },
     open(opts) {
       opts = opts || {};
-      this._super(opts);
-      this.set("optedOut", opts.post && opts.post.opted_out);
+      let promise = this._super(opts);
+      // Discourse 2.4.0 sets options directly, 2.5.0 relies on promises
+      // TODO: drop the non-promise code once promises are supported in stable
+      if (promise) {
+        return promise.then(() => this.groupTrackerOptOut(opts));
+      }
+      this.groupTrackerOptOut(opts);
     }
   });
 
