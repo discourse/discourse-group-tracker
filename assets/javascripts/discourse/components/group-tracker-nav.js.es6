@@ -1,9 +1,6 @@
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 import DiscourseURL from "discourse/lib/url";
-import {
-  default as computed,
-  on
-} from "ember-addons/ember-computed-decorators";
+import { default as computed, on } from "discourse-common/utils/decorators";
 
 export default Ember.Component.extend({
   classNames: ["group-tracker-nav"],
