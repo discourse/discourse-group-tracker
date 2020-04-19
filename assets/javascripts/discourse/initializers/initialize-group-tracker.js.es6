@@ -54,7 +54,7 @@ function addNavigationBarItems(api) {
 }
 
 function addControlToTimeline(api) {
-  const appEvents = api.container.lookup("app-events:main");
+  const appEvents = api.container.lookup("service:app-events");
   const topicController = api.container.lookup("controller:topic");
 
   let currentPostNumber = 1;
