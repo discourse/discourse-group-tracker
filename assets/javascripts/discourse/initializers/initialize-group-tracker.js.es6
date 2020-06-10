@@ -4,6 +4,7 @@ import computed from "discourse-common/utils/decorators";
 import Composer from "discourse/models/composer";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 import DiscourseURL from "discourse/lib/url";
+import getURL from "discourse-common/lib/get-url";
 
 function modifyTopicModel(api) {
   api.modifyClass("model:topic", {
@@ -46,7 +47,7 @@ function addNavigationBarItems(api) {
         displayName: g.full_name,
         title: g.full_name,
         classNames: groupId,
-        href: Discourse.getURL(`/g/${g.name}/activity/posts`),
+        href: getURL(`/g/${g.name}/activity/posts`),
         filterMode: groupId,
         includeCategoryId: true
       });
