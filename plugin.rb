@@ -103,10 +103,10 @@ after_initialize do
   end
 
   # TODO Drop after Discourse 2.6.0 release
-  if respond_to?(:topic_view_post_custom_fields_whitelister)
-    topic_view_post_custom_fields_whitelister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
-  else
+  if respond_to?(:topic_view_post_custom_fields_allowlister)
     topic_view_post_custom_fields_allowlister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
+  else
+    topic_view_post_custom_fields_whitelister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
   end
 
   add_to_serializer(:topic_view, :first_tracked_post, false) do
