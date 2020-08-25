@@ -12,7 +12,7 @@ function modifyTopicModel(api) {
     @computed("first_tracked_post.group")
     firstTrackedPostIcon(group) {
       return groupTrackerIcon(group, this.site, this.siteSettings);
-    }
+    },
   });
 }
 
@@ -27,7 +27,7 @@ function addTrackedGroupToTopicList(api) {
       }
 
       return classNames;
-    }
+    },
   });
 }
 
@@ -39,8 +39,8 @@ function addNavigationBarItems(api) {
   }
 
   tracked_groups
-    .filter(g => g.add_to_navigation_bar)
-    .forEach(g => {
+    .filter((g) => g.add_to_navigation_bar)
+    .forEach((g) => {
       let groupId = `group-${g.name}`;
       api.addNavigationBarItem({
         name: groupId,
@@ -49,7 +49,7 @@ function addNavigationBarItems(api) {
         classNames: groupId,
         href: getURL(`/g/${g.name}/activity/posts`),
         filterMode: groupId,
-        includeCategoryId: true
+        includeCategoryId: true,
       });
     });
 }
@@ -64,7 +64,7 @@ function addControlToTimeline(api) {
     currentPostNumber = post.post_number;
   });
 
-  api.decorateWidget("timeline-controls:before", helper => {
+  api.decorateWidget("timeline-controls:before", (helper) => {
     const { topic } = helper.attrs;
     if (topic.first_tracked_post) {
       return helper.attach("button", {
@@ -72,7 +72,7 @@ function addControlToTimeline(api) {
         icon: "arrow-circle-up",
         title: "group_tracker.first_post",
         action: "jumpToFirstTrackedPost",
-        disabled: topic.first_tracked_post.post_number >= currentPostNumber
+        disabled: topic.first_tracked_post.post_number >= currentPostNumber,
       });
     }
   });
@@ -86,7 +86,7 @@ function addControlToTimeline(api) {
           topic.first_tracked_post.post_number
         );
       }
-    }
+    },
   });
 
   function getPreviousTrackedPost(topic) {
@@ -97,7 +97,7 @@ function addControlToTimeline(api) {
       topic &&
       topic.tracked_posts &&
       topic.tracked_posts
-        .filter(p => {
+        .filter((p) => {
           return (
             p.post_number < currentPostNumber &&
             stream.includes(postStream.findPostIdForPostNumber(p.post_number))
@@ -114,7 +114,7 @@ function addControlToTimeline(api) {
     return (
       topic &&
       topic.tracked_posts &&
-      topic.tracked_posts.find(p => {
+      topic.tracked_posts.find((p) => {
         return (
           p.post_number > currentPostNumber &&
           stream.includes(postStream.findPostIdForPostNumber(p.post_number))
@@ -123,7 +123,7 @@ function addControlToTimeline(api) {
     );
   }
 
-  api.decorateWidget("timeline-footer-controls:after", helper => {
+  api.decorateWidget("timeline-footer-controls:after", (helper) => {
     const { topic } = helper.attrs;
     const { site, siteSettings } = helper.widget;
     const nextTrackedPost = getNextTrackedPost(topic);
@@ -142,11 +142,11 @@ function addControlToTimeline(api) {
       contents: iconNode("arrow-left"),
       title: "group_tracker.prev_post",
       action: "jumpToPrevTrackedPost",
-      disabled: group === null
+      disabled: group === null,
     });
   });
 
-  api.decorateWidget("timeline-footer-controls:after", helper => {
+  api.decorateWidget("timeline-footer-controls:after", (helper) => {
     const { topic } = helper.attrs;
     const { site, siteSettings } = helper.widget;
     const nextTrackedPost = getNextTrackedPost(topic);
@@ -165,7 +165,7 @@ function addControlToTimeline(api) {
       contents: iconNode("arrow-right"),
       title: "group_tracker.next_post",
       action: "jumpToNextTrackedPost",
-      disabled: group === null
+      disabled: group === null,
     });
   });
 
@@ -188,20 +188,20 @@ function addControlToTimeline(api) {
         const url = topic.url + "/" + prevTrackedPost.post_number;
         DiscourseURL.routeTo(url);
       }
-    }
+    },
   });
 }
 
 function addOptOutClassOnPost(api) {
   api.includePostAttributes("opted_out");
-  api.addPostClassesCallback(p => p.opted_out && ["opted-out"]);
+  api.addPostClassesCallback((p) => p.opted_out && ["opted-out"]);
 }
 
 function addOptOutToggle(api) {
   const ALLOWED_COMPOSER_ACTIONS = [Composer.CREATE_TOPIC, Composer.REPLY];
 
   api.modifyClass("component:composer-body", {
-    classNameBindings: ["composer.optedOut"]
+    classNameBindings: ["composer.optedOut"],
   });
 
   api.modifyClass("model:composer", {
@@ -217,7 +217,7 @@ function addOptOutToggle(api) {
         return promise.then(() => this.groupTrackerOptOut(opts));
       }
       this.groupTrackerOptOut(opts);
-    }
+    },
   });
 
   api.modifyClass("controller:composer", {
@@ -229,7 +229,7 @@ function addOptOutToggle(api) {
       if (ALLOWED_COMPOSER_ACTIONS.indexOf(action) < 0) return false;
       return (
         this.site.tracked_groups
-          .map(g => g.id)
+          .map((g) => g.id)
           .indexOf(this.currentUser.primary_group_id) >= 0
       );
     },
@@ -237,25 +237,25 @@ function addOptOutToggle(api) {
     actions: {
       togglePostTracking() {
         this.toggleProperty("model.optedOut");
-      }
-    }
+      },
+    },
   });
-
-  const composerController = api.container.lookup("controller:composer");
 
   api.modifyClass("model:post", {
     beforeCreate(props) {
+      const composerController = api.container.lookup("controller:composer");
+
       if (composerController.get("model.optedOut")) {
         props.opted_out = true;
       }
-    }
+    },
   });
 
   api.addToolbarPopupMenuOptionsCallback(() => ({
     icon: "unlink",
     label: "group_tracker.opt_out.title",
     action: "togglePostTracking",
-    condition: "showOptOutToggle"
+    condition: "showOptOutToggle",
   }));
 }
 
@@ -263,7 +263,7 @@ export default {
   name: "group-tracker",
 
   initialize() {
-    withPluginApi("0.8.9", api => {
+    withPluginApi("0.8.9", (api) => {
       modifyTopicModel(api);
 
       addNavigationBarItems(api);
@@ -274,5 +274,5 @@ export default {
       addOptOutToggle(api);
       addTrackedGroupToTopicList(api);
     });
-  }
+  },
 };
