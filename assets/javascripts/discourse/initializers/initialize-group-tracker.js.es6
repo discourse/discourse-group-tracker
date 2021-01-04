@@ -223,10 +223,10 @@ function addOptOutToggle(api) {
   api.modifyClass("controller:composer", {
     @computed("model.action")
     showOptOutToggle(action) {
-      if (!this.site.tracked_groups) return false;
-      if (!this.currentUser) return false;
-      if (!this.currentUser.primary_group_id) return false;
-      if (ALLOWED_COMPOSER_ACTIONS.indexOf(action) < 0) return false;
+      if (!this.site.tracked_groups) {return false;}
+      if (!this.currentUser) {return false;}
+      if (!this.currentUser.primary_group_id) {return false;}
+      if (ALLOWED_COMPOSER_ACTIONS.indexOf(action) < 0) {return false;}
       return (
         this.site.tracked_groups
           .map((g) => g.id)
