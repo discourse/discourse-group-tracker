@@ -3,7 +3,7 @@
 
 # name: discourse-group-tracker
 # about: Group Tracker plugin for Discourse
-# version: 0.1
+# version: 1.0
 # author: Régis Hanol
 
 register_asset 'stylesheets/group-tracker.scss'

@@ -5,7 +5,7 @@ function update(group, name, value) {
 
   return ajax(`/admin/groups/${group.id}/${name}`, {
     type: "PUT",
-    data: group.getProperties(name)
+    data: group.getProperties(name),
   });
 }
 
@@ -21,6 +21,6 @@ export default {
 
     trackedPostIconChanged(value) {
       update(this.args.group, "tracked_post_icon", value);
-    }
-  }
+    },
+  },
 };
