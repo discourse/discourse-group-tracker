@@ -15,6 +15,7 @@ hooks:
           - mkdir -p plugins
           - git clone https://github.com/discourse/discourse-group-tracker.git
 ```
+
 Rebuild the container
 
 ```
@@ -30,7 +31,7 @@ In the "Manage" section of the group you want people to be able to track, enable
 
 Only users who use this group as their **Primary Group** will be tracked!
 
-In the "Icon used for tracked posts" field, enter the *name* of a [fontawesome
+In the "Icon used for tracked posts" field, enter the _name_ of a [fontawesome
 icon](https://meta.discourse.org/t/101643) that you want to use.
 To use your own image, you'll need to
 [add a new custom icon by following this guide](https://meta.discourse.org/t/115736).

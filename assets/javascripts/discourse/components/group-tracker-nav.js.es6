@@ -38,7 +38,7 @@ export default Ember.Component.extend({
       topic &&
       topic.tracked_posts &&
       topic.tracked_posts
-        .filter(p => {
+        .filter((p) => {
           return (
             p.post_number < this.currentPostNumber &&
             stream.includes(postStream.findPostIdForPostNumber(p.post_number))
@@ -56,7 +56,7 @@ export default Ember.Component.extend({
     return (
       topic &&
       topic.tracked_posts &&
-      topic.tracked_posts.find(p => {
+      topic.tracked_posts.find((p) => {
         return (
           p.post_number > this.currentPostNumber &&
           stream.includes(postStream.findPostIdForPostNumber(p.post_number))
@@ -71,8 +71,8 @@ export default Ember.Component.extend({
     return nextTrackedPost ? nextTrackedPost.group : null;
   },
 
-  @computed("nextTrackedPostGroup", "currentPostNumber")
-  nextTrackerIcon(nextTrackedPostGroup, currentPostNumber) {
+  @computed("nextTrackedPostGroup")
+  nextTrackerIcon(nextTrackedPostGroup) {
     return groupTrackerIcon(nextTrackedPostGroup, this.site, this.siteSettings);
   },
 
@@ -120,6 +120,6 @@ export default Ember.Component.extend({
         const url = topic.url + "/" + prevTrackedPost.post_number;
         DiscourseURL.routeTo(url);
       }
-    }
-  }
+    },
+  },
 });
