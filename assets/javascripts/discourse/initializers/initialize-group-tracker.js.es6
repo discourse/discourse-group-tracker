@@ -6,8 +6,12 @@ import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/grou
 import DiscourseURL from "discourse/lib/url";
 import getURL from "discourse-common/lib/get-url";
 
+const PLUGIN_ID = "discourse-group-tracker";
+
 function modifyTopicModel(api) {
   api.modifyClass("model:topic", {
+    pluginId: PLUGIN_ID,
+
     // used in the 'topic-list-before-status' connector
     @computed("first_tracked_post.group")
     firstTrackedPostIcon(group) {
@@ -18,6 +22,8 @@ function modifyTopicModel(api) {
 
 function addTrackedGroupToTopicList(api) {
   api.modifyClass("component:topic-list-item", {
+    pluginId: PLUGIN_ID,
+
     @computed("topic.first_tracked_post")
     unboundClassNames(firstTrackedPost) {
       let classNames = this._super();
@@ -201,10 +207,14 @@ function addOptOutToggle(api) {
   const ALLOWED_COMPOSER_ACTIONS = [Composer.CREATE_TOPIC, Composer.REPLY];
 
   api.modifyClass("component:composer-body", {
+    pluginId: PLUGIN_ID,
+
     classNameBindings: ["composer.optedOut"],
   });
 
   api.modifyClass("model:composer", {
+    pluginId: PLUGIN_ID,
+
     groupTrackerOptOut(opts) {
       this.set("optedOut", opts.post && opts.post.opted_out);
     },
@@ -221,6 +231,8 @@ function addOptOutToggle(api) {
   });
 
   api.modifyClass("controller:composer", {
+    pluginId: PLUGIN_ID,
+
     @computed("model.action")
     showOptOutToggle(action) {
       if (!this.site.tracked_groups) {
@@ -250,6 +262,8 @@ function addOptOutToggle(api) {
   });
 
   api.modifyClass("model:post", {
+    pluginId: PLUGIN_ID,
+
     beforeCreate(props) {
       const composerController = api.container.lookup("controller:composer");
 
