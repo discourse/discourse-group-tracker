@@ -91,8 +91,8 @@ after_initialize do
     ApplicationSerializer.expire_cache_fragment!(TRACKED_GROUPS)
   end
 
-  add_preloaded_topic_list_custom_field(GroupTracker::TRACKED_POSTS)
   register_topic_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
+  add_preloaded_topic_list_custom_field(GroupTracker::TRACKED_POSTS)
 
   add_to_serializer(:topic_list_item, :first_tracked_post, false) do
     object.custom_fields[GroupTracker::TRACKED_POSTS]
@@ -100,13 +100,6 @@ after_initialize do
 
   add_to_serializer(:topic_list_item, :include_first_tracked_post?) do
     object.custom_fields[GroupTracker::TRACKED_POSTS].present?
-  end
-
-  # TODO Drop after Discourse 2.6.0 release
-  if respond_to?(:topic_view_post_custom_fields_allowlister)
-    topic_view_post_custom_fields_allowlister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
-  else
-    topic_view_post_custom_fields_whitelister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
   end
 
   add_to_serializer(:topic_view, :first_tracked_post, false) do
@@ -145,6 +138,8 @@ after_initialize do
 
   register_post_custom_field_type(GroupTracker::OPTED_OUT, :boolean)
   register_post_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
+
+  topic_view_post_custom_fields_allowlister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
 
   add_to_serializer(:post, :opted_out, false) do
     post_custom_fields[GroupTracker::OPTED_OUT]
