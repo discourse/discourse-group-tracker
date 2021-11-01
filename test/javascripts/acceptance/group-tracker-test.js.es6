@@ -1,5 +1,6 @@
 import { acceptance } from "discourse/tests/helpers/qunit-helpers";
 import Site from "discourse/models/site";
+import { test } from "qunit";
 
 acceptance("Group tracker", function (needs) {
   needs.user();
