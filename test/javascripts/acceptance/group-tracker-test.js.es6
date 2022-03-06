@@ -1,4 +1,8 @@
-import { acceptance } from "discourse/tests/helpers/qunit-helpers";
+import {
+  acceptance,
+  count,
+  visit,
+} from "discourse/tests/helpers/qunit-helpers";
 import Site from "discourse/models/site";
 import { test } from "qunit";
 
@@ -17,8 +21,9 @@ acceptance("Group tracker", function (needs) {
 
     await visit("/");
 
-    assert.ok(
-      find("#navigation-bar .group-testing").length === 1,
+    assert.strictEqual(
+      count("#navigation-bar .group-testing"),
+      1,
       "it should display the right nav item"
     );
   });
