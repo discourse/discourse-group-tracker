@@ -5,6 +5,7 @@
 # about: Group Tracker plugin for Discourse
 # version: 1.0
 # author: Régis Hanol
+# transpile_js: true
 
 register_asset 'stylesheets/group-tracker.scss'
 
@@ -167,7 +168,7 @@ after_initialize do
   on(:post_edited) do |post|
     next unless post.archetype != Archetype.private_message
 
-    # we're only concerned when there was an ownwership change
+    # we're only concerned when there was an ownership change
     next unless user_ids = post.previous_changes["user_id"]
     # and only if a human was concerned
     next unless user_ids.any? { |id| id > 0 }
