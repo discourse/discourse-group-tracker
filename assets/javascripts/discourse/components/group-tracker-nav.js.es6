@@ -1,8 +1,9 @@
+import Component from "@ember/component";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 import DiscourseURL from "discourse/lib/url";
-import { default as computed, on } from "discourse-common/utils/decorators";
+import discourseComputed, { on } from "discourse-common/utils/decorators";
 
-export default Ember.Component.extend({
+export default Component.extend({
   classNames: ["group-tracker-nav"],
 
   setCurrentPostNumber({ post }) {
@@ -65,39 +66,39 @@ export default Ember.Component.extend({
     );
   },
 
-  @computed("topic", "currentPostNumber")
+  @discourseComputed("topic", "currentPostNumber")
   nextTrackedPostGroup(topic) {
     const nextTrackedPost = this.getNextTrackedPost(topic);
     return nextTrackedPost ? nextTrackedPost.group : null;
   },
 
-  @computed("nextTrackedPostGroup")
+  @discourseComputed("nextTrackedPostGroup")
   nextTrackerIcon(nextTrackedPostGroup) {
     return groupTrackerIcon(nextTrackedPostGroup, this.site, this.siteSettings);
   },
 
-  @computed("nextTrackedPostGroup", "currentPostNumber")
+  @discourseComputed("nextTrackedPostGroup", "currentPostNumber")
   nextTrackedPostDisabled(nextTrackedPostGroup) {
     return nextTrackedPostGroup === null;
   },
 
-  @computed("nextTrackedPostGroup", "prevTrackedPostGroup")
+  @discourseComputed("nextTrackedPostGroup", "prevTrackedPostGroup")
   group_tracker_posts_exists(nextTrackedPostGroup, prevTrackedPostGroup) {
     return nextTrackedPostGroup !== null || prevTrackedPostGroup !== null;
   },
 
-  @computed("topic", "currentPostNumber")
+  @discourseComputed("topic", "currentPostNumber")
   prevTrackedPostGroup(topic) {
     const prevTrackedPost = this.getPreviousTrackedPost(topic);
     return prevTrackedPost ? prevTrackedPost.group : null;
   },
 
-  @computed("prevTrackedPostGroup", "currentPostNumber")
+  @discourseComputed("prevTrackedPostGroup", "currentPostNumber")
   prevTrackerIcon(prevTrackedPostGroup) {
     return groupTrackerIcon(prevTrackedPostGroup, this.site, this.siteSettings);
   },
 
-  @computed("prevTrackedPostGroup", "currentPostNumber")
+  @discourseComputed("prevTrackedPostGroup", "currentPostNumber")
   prevTrackedPostDisabled(prevTrackedPostGroup) {
     return prevTrackedPostGroup === null;
   },
