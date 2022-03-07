@@ -1,10 +1,7 @@
-import {
-  acceptance,
-  count,
-  visit,
-} from "discourse/tests/helpers/qunit-helpers";
+import { acceptance, count } from "discourse/tests/helpers/qunit-helpers";
 import Site from "discourse/models/site";
 import { test } from "qunit";
+import { visit } from "@ember/test-helpers";
 
 acceptance("Group tracker", function (needs) {
   needs.user();
