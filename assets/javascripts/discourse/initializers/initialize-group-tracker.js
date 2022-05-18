@@ -62,7 +62,6 @@ function addNavigationBarItems(api) {
 
 function addControlToTimeline(api) {
   const appEvents = api.container.lookup("service:app-events");
-  const topicController = api.container.lookup("controller:topic");
 
   let currentPostNumber = 1;
 
@@ -87,10 +86,7 @@ function addControlToTimeline(api) {
     jumpToFirstTrackedPost() {
       const { topic } = this.attrs;
       if (topic.first_tracked_post) {
-        topicController.send(
-          "jumpToPost",
-          topic.first_tracked_post.post_number
-        );
+        DiscourseURL.jumpToPost(topic.firstTrackedPost.post_number);
       }
     },
   });
