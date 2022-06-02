@@ -1,4 +1,4 @@
-{{!-- Only show these fields when editing an existing group --}}
+{{! Only show these fields when editing an existing group }}
 {{#if group.id}}
   <div class="control-group">
     <label>
@@ -22,8 +22,11 @@
   </div>
 
   <div class="control-group">
-    <label for="tracked_post_icon">{{i18n "group_tracker.tracked_post_icon.label"}}</label>
-    {{text-field name="tracked_post_icon"
+    <label for="tracked_post_icon">
+      {{i18n "group_tracker.tracked_post_icon.label"}}
+    </label>
+    {{text-field
+      name="tracked_post_icon"
       value=group.tracked_post_icon
       focus-out=(action "trackedPostIconChanged")
       placeholderKey="group_tracker.tracked_post_icon.placeholder"
