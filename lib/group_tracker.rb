@@ -24,6 +24,7 @@ module GroupTracker
     post.user_id > 0 &&
     (post.post_type == Post.types[:regular] || post.post_type == Post.types[:moderator_action]) &&
     post.archetype != Archetype.private_message &&
+    post.user.present? &&
     tracked_group_ids.include?(post.user.primary_group_id)
   end
 

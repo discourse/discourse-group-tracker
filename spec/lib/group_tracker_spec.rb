@@ -4,11 +4,8 @@ require "rails_helper"
 require_relative "./../../lib/group_tracker"
 
 describe GroupTracker do
-
   describe "#should_track?" do
-
     let(:tracked_group) { build(:group, id: 42) }
-
     let(:robot) { build(:user, id: -1, primary_group: tracked_group) }
     let(:human) { build(:user, id: 1, primary_group: tracked_group) }
 
@@ -45,6 +42,12 @@ describe GroupTracker do
       expect(GroupTracker.should_track?(post)).to eq(true)
     end
 
-  end
+    it "works with posts of deleted users" do
+      user = Fabricate(:user)
+      post = Fabricate(:post, user: user)
+      user.destroy!
 
+      expect(GroupTracker.should_track?(post.reload)).to eq(false)
+    end
+  end
 end
