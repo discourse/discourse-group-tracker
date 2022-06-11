@@ -55,7 +55,6 @@ function addNavigationBarItems(api) {
         title: g.full_name,
         classNames: groupId,
         href: getURL(`/g/${g.name}/activity/posts`),
-        filterMode: groupId,
         includeCategoryId: true,
       });
     });
