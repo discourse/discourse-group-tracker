@@ -16,7 +16,7 @@ describe "Group Tracking" do
     group
   end
 
-  context "toggling 'track_posts' on a group" do
+  context "when toggling 'track_posts' on a group" do
 
     it "updates existing posts made by members of the group" do
       group = Fabricate(:group)
@@ -52,7 +52,7 @@ describe "Group Tracking" do
 
   end
 
-  context "creating tracked posts" do
+  context "when creating tracked posts" do
 
     let(:raw) { "Hello tracked world!" }
 
@@ -88,7 +88,7 @@ describe "Group Tracking" do
 
   end
 
-  context "editing a tracked post" do
+  context "when editing a tracked post" do
 
     it "resets tracking data when a post changes ownership" do
       topic = Fabricate(:topic, user: user)
@@ -116,7 +116,7 @@ describe "Group Tracking" do
 
   end
 
-  context "moving a tracked post" do
+  context "when moving a tracked post" do
 
     it "resets tracking data when a post is moved to another topic" do
       topic = Fabricate(:topic, user: user)
@@ -141,7 +141,7 @@ describe "Group Tracking" do
 
   end
 
-  context "destroying a tracked post" do
+  context "when destroying a tracked post" do
 
     it "resets tracking data" do
       topic = Fabricate(:topic, user: user)
@@ -160,7 +160,7 @@ describe "Group Tracking" do
 
   end
 
-  context "tracked group membership" do
+  describe "tracked group membership" do
 
     it "resets tracking data" do
       user = Fabricate(:user, groups: [tracked_group])
