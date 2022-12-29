@@ -3,7 +3,6 @@
 require "rails_helper"
 
 describe "Group Tracking" do
-
   let(:user) { Fabricate(:user) }
   let(:admin) { Fabricate(:admin) }
   let(:member1) { Fabricate(:user, primary_group: tracked_group, groups: [tracked_group]) }
@@ -17,7 +16,6 @@ describe "Group Tracking" do
   end
 
   context "when toggling 'track_posts' on a group" do
-
     it "updates existing posts made by members of the group" do
       group = Fabricate(:group)
 
@@ -31,29 +29,29 @@ describe "Group Tracking" do
 
       sign_in(admin)
 
-      put "/admin/groups/#{group.id}/track_posts.json", params: {
-        track_posts: "true"
-      }
+      put "/admin/groups/#{group.id}/track_posts.json", params: { track_posts: "true" }
 
       expect(group.reload.custom_fields[GroupTracker::TRACK_POSTS]).to eq(true)
-      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => group.name, "post_number" => 1)
-      expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => group.name, "post_number" => 3)
+      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => group.name,
+        "post_number" => 1,
+      )
+      expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => group.name,
+        "post_number" => 3,
+      )
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-      put "/admin/groups/#{group.id}/track_posts.json", params: {
-        track_posts: "false"
-      }
+      put "/admin/groups/#{group.id}/track_posts.json", params: { track_posts: "false" }
 
       expect(group.reload.custom_fields[GroupTracker::TRACK_POSTS]).to eq(false)
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
-
   end
 
   context "when creating tracked posts" do
-
     let(:raw) { "Hello tracked world!" }
 
     it "inserts tracking data" do
@@ -77,19 +75,23 @@ describe "Group Tracking" do
 
       topic.reload
 
-      expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 2)
+      expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 2,
+      )
 
-      expect(topic.ordered_posts[1].custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 5)
+      expect(topic.ordered_posts[1].custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 5,
+      )
 
       [0, 2, 3, 4].each do |i|
         expect(topic.ordered_posts[i].custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       end
     end
-
   end
 
   context "when editing a tracked post" do
-
     it "resets tracking data when a post changes ownership" do
       topic = Fabricate(:topic, user: user)
       post1 = Fabricate(:post, topic: topic, user: user)
@@ -99,25 +101,33 @@ describe "Group Tracking" do
       sign_in(admin)
 
       # from a normal user to a tracked user
-      post "/t/#{topic.id}/change-owner.json", params: {
-        post_ids: [post1.id], username: member2.username
-      }
+      post "/t/#{topic.id}/change-owner.json",
+           params: {
+             post_ids: [post1.id],
+             username: member2.username,
+           }
 
       # from a tracked user to a normal user
-      post "/t/#{topic.id}/change-owner.json", params: {
-        post_ids: [post3.id], username: user.username
-      }
+      post "/t/#{topic.id}/change-owner.json",
+           params: {
+             post_ids: [post3.id],
+             username: user.username,
+           }
 
-      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 1)
-      expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 2)
+      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 1,
+      )
+      expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 2,
+      )
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
-
   end
 
   context "when moving a tracked post" do
-
     it "resets tracking data when a post is moved to another topic" do
       topic = Fabricate(:topic, user: user)
       post1 = Fabricate(:post, topic: topic, user: user)
@@ -125,24 +135,30 @@ describe "Group Tracking" do
       post3 = Fabricate(:post, topic: topic, user: member2)
 
       sign_in(admin)
-      post "/t/#{topic.id}/move-posts.json", params: {
-        post_ids: [post2.id], title: "This is a valid destination topic title"
-      }
+      post "/t/#{topic.id}/move-posts.json",
+           params: {
+             post_ids: [post2.id],
+             title: "This is a valid destination topic title",
+           }
 
       destination_topic = Topic.last
 
-      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 3)
+      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 3,
+      )
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-      expect(destination_topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 1)
+      expect(destination_topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 1,
+      )
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
-
   end
 
   context "when destroying a tracked post" do
-
     it "resets tracking data" do
       topic = Fabricate(:topic, user: user)
       post1 = Fabricate(:post, topic: topic, user: user)
@@ -152,16 +168,17 @@ describe "Group Tracking" do
       sign_in(admin)
       delete "/posts/#{post2.id}.json"
 
-      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 3)
+      expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 3,
+      )
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
-
   end
 
   describe "tracked group membership" do
-
     it "resets tracking data" do
       user = Fabricate(:user, groups: [tracked_group])
       user2 = Fabricate(:user)
@@ -179,29 +196,56 @@ describe "Group Tracking" do
 
       sign_in(admin)
 
-      put "/admin/users/#{user.id}/primary_group.json", params: {
-        primary_group_id: tracked_group.id
-      }
+      put "/admin/users/#{user.id}/primary_group.json",
+          params: {
+            primary_group_id: tracked_group.id,
+          }
 
-      expect(topic1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 1)
-      expect(post1_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 3)
+      expect(topic1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 1,
+      )
+      expect(post1_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 3,
+      )
       expect(post1_2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post1_3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-      expect(topic2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 1)
-      expect(post2_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 2)
-      expect(post2_2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 3)
-      expect(post2_3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 4)
+      expect(topic2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 1,
+      )
+      expect(post2_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 2,
+      )
+      expect(post2_2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 3,
+      )
+      expect(post2_3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 4,
+      )
       expect(post2_4.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
       put "/admin/users/#{member1.id}/primary_group.json"
 
-      expect(topic2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 2)
+      expect(topic2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 2,
+      )
       expect(post2_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
-      expect(post2_2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 3)
-      expect(post2_3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq("group" => tracked_group.name, "post_number" => 4)
+      expect(post2_2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 3,
+      )
+      expect(post2_3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 4,
+      )
       expect(post2_4.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
   end
-
 end
