@@ -16,12 +16,16 @@ describe GroupTracker do
       expect(GroupTracker.should_track?(post)).to eq(false)
     end
 
-    Post.types.except(:regular, :moderator_action).keys.each do |post_type|
-      it "does not track #{post_type} posts" do
-        post = build(:post, user: human, post_type: post_type)
-        expect(GroupTracker.should_track?(post)).to eq(false)
+    Post
+      .types
+      .except(:regular, :moderator_action)
+      .keys
+      .each do |post_type|
+        it "does not track #{post_type} posts" do
+          post = build(:post, user: human, post_type: post_type)
+          expect(GroupTracker.should_track?(post)).to eq(false)
+        end
       end
-    end
 
     it "does not track private messages" do
       topic = build(:topic, archetype: Archetype.private_message)

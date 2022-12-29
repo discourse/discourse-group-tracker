@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
 module GroupTracker
-
-  GROUP_ATTRIBUTES ||= %w{
-    track_posts
-    add_to_navigation_bar
-    tracked_post_icon
-  }
+  GROUP_ATTRIBUTES ||= %w[track_posts add_to_navigation_bar tracked_post_icon]
 
   def self.key(name)
     "group_tracker_#{name}"
   end
 
-  OPTED_OUT     ||= key("opted_out")
-  TRACK_POSTS   ||= key("track_posts")
+  OPTED_OUT ||= key("opted_out")
+  TRACK_POSTS ||= key("track_posts")
   TRACKED_POSTS ||= key("tracked_posts")
 
   def self.tracked_group_ids
@@ -22,10 +17,9 @@ module GroupTracker
 
   def self.should_track?(post)
     post.user_id > 0 &&
-    (post.post_type == Post.types[:regular] || post.post_type == Post.types[:moderator_action]) &&
-    post.archetype != Archetype.private_message &&
-    post.user.present? &&
-    tracked_group_ids.include?(post.user.primary_group_id)
+      (post.post_type == Post.types[:regular] || post.post_type == Post.types[:moderator_action]) &&
+      post.archetype != Archetype.private_message && post.user.present? &&
+      tracked_group_ids.include?(post.user.primary_group_id)
   end
 
   def self.update_tracking!(topic_id = nil)
@@ -167,5 +161,4 @@ module GroupTracker
       custom_field_name: key("tracked_posts"),
     )
   end
-
 end

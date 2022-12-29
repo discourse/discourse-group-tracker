@@ -7,35 +7,40 @@
 # author: Régis Hanol
 # transpile_js: true
 
-register_asset 'stylesheets/group-tracker.scss'
+register_asset "stylesheets/group-tracker.scss"
 
 after_initialize do
-
   load File.expand_path("../lib/group_tracker.rb", __FILE__)
   load File.expand_path("../app/serializers/tracked_group_serializer.rb", __FILE__)
 
   Discourse::Application.routes.append do
     namespace :admin, constraints: AdminConstraint.new do
-      put "groups/:id/track_posts" => "groups#update_track_posts", constraints: { id: /\d+/ }
-      put "groups/:id/add_to_navigation_bar" => "groups#update_add_to_navigation_bar", constraints: { id: /\d+/ }
-      put "groups/:id/tracked_post_icon" => "groups#update_tracked_post_icon", constraints: { id: /\d+/ }
+      put "groups/:id/track_posts" => "groups#update_track_posts", :constraints => { id: /\d+/ }
+      put "groups/:id/add_to_navigation_bar" => "groups#update_add_to_navigation_bar",
+          :constraints => {
+            id: /\d+/,
+          }
+      put "groups/:id/tracked_post_icon" => "groups#update_tracked_post_icon",
+          :constraints => {
+            id: /\d+/,
+          }
     end
   end
 
   register_group_custom_field_type(GroupTracker.key("track_posts"), :boolean)
   register_group_custom_field_type(GroupTracker.key("add_to_navigation_bar"), :boolean)
 
-  register_svg_icon 'arrow-circle-up' if respond_to?(:register_svg_icon)
-  register_svg_icon 'crown' if respond_to?(:register_svg_icon)
-  register_svg_icon 'arrow-right' if respond_to?(:register_svg_icon)
-  register_svg_icon 'arrow-left' if respond_to?(:register_svg_icon)
+  register_svg_icon "arrow-circle-up" if respond_to?(:register_svg_icon)
+  register_svg_icon "crown" if respond_to?(:register_svg_icon)
+  register_svg_icon "arrow-right" if respond_to?(:register_svg_icon)
+  register_svg_icon "arrow-left" if respond_to?(:register_svg_icon)
 
   GroupTracker::GROUP_ATTRIBUTES.each do |attribute|
     add_preloaded_group_custom_field(GroupTracker.key(attribute))
 
     # GroupShowSerializer extends BasicGroup but in production mode the
     # child doesn't pick up the parent's changes.
-    [:basic_group, :group_show].each do |s|
+    %i[basic_group group_show].each do |s|
       add_to_serializer(s, attribute.to_sym, false) do
         object.custom_fields[GroupTracker.key(attribute)]
       end
@@ -60,7 +65,9 @@ after_initialize do
 
   add_to_class(Admin::GroupsController, :update_add_to_navigation_bar) do
     group = Group.find(params[:id])
-    group.custom_fields[GroupTracker.key("add_to_navigation_bar")] = params[:add_to_navigation_bar] == "true"
+    group.custom_fields[GroupTracker.key("add_to_navigation_bar")] = params[
+      :add_to_navigation_bar
+    ] == "true"
     group.save
 
     render json: success_json
@@ -80,7 +87,10 @@ after_initialize do
     cache_fragment(TRACKED_GROUPS) do
       tracked_groups = Group.where(id: GroupTracker.tracked_group_ids)
       Group.preload_custom_fields(tracked_groups, Group.preloaded_custom_field_names)
-      ActiveModel::ArraySerializer.new(tracked_groups, each_serializer: TrackedGroupSerializer).as_json
+      ActiveModel::ArraySerializer.new(
+        tracked_groups,
+        each_serializer: TrackedGroupSerializer,
+      ).as_json
     end
   end
 
@@ -140,15 +150,13 @@ after_initialize do
   register_post_custom_field_type(GroupTracker::OPTED_OUT, :boolean)
   register_post_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
 
-  topic_view_post_custom_fields_allowlister { [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT] }
-
-  add_to_serializer(:post, :opted_out, false) do
-    post_custom_fields[GroupTracker::OPTED_OUT]
+  topic_view_post_custom_fields_allowlister do
+    [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT]
   end
 
-  add_to_serializer(:post, :include_opted_out?) do
-    post_custom_fields[GroupTracker::OPTED_OUT]
-  end
+  add_to_serializer(:post, :opted_out, false) { post_custom_fields[GroupTracker::OPTED_OUT] }
+
+  add_to_serializer(:post, :include_opted_out?) { post_custom_fields[GroupTracker::OPTED_OUT] }
 
   add_permitted_post_create_param("opted_out")
 
@@ -208,5 +216,4 @@ after_initialize do
 
     GroupTracker.update_tracking!
   end
-
 end
