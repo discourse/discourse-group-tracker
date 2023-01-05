@@ -89,22 +89,20 @@ export default class GroupTrackerNav extends Component {
 
   @action
   jumpToNextTrackedPost() {
-    const topic = this.args.topic;
     const nextTrackedPost = this.getNextTrackedPost();
 
     if (nextTrackedPost) {
-      const url = topic.url + "/" + nextTrackedPost.post_number;
+      const url = this.args.topic.url + "/" + nextTrackedPost.post_number;
       DiscourseURL.routeTo(url);
     }
   }
 
   @action
   jumpToPrevTrackedPost() {
-    const topic = this.args.topic;
     const prevTrackedPost = this.getPreviousTrackedPost();
 
     if (prevTrackedPost) {
-      const url = topic.url + "/" + prevTrackedPost.post_number;
+      const url = this.args.topic.url + "/" + prevTrackedPost.post_number;
       DiscourseURL.routeTo(url);
     }
   }
