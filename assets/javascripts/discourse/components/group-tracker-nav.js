@@ -1,37 +1,17 @@
-import Component from "@ember/component";
+import { action } from "@ember/object";
+import Component from "@glimmer/component";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 import DiscourseURL from "discourse/lib/url";
-import discourseComputed, { on } from "discourse-common/utils/decorators";
+import { inject as service } from "@ember/service";
+import { alias } from "@ember/object/computed";
 
-export default Component.extend({
-  classNames: ["group-tracker-nav"],
-
-  setCurrentPostNumber({ post }) {
-    this.set("currentPostNumber", post.post_number);
-  },
-
-  @on("init")
-  init() {
-    this._super(...arguments);
-    this.set("currentPostNumber", 1);
-    this.appEvents.on(
-      "topic:current-post-changed",
-      this,
-      "setCurrentPostNumber"
-    );
-  },
-
-  @on("destroy")
-  destroy() {
-    this.appEvents.off(
-      "topic:current-post-changed",
-      this,
-      "setCurrentPostNumber"
-    );
-  },
+export default class GroupTrackerNav extends Component {
+  @service site;
+  @service siteSettings;
+  @alias("args.topic.currentPost") postId;
 
   getPreviousTrackedPost() {
-    const topic = this.topic;
+    const topic = this.args.topic;
     const postStream = topic.get("postStream");
     const stream = postStream.get("stream");
 
@@ -39,18 +19,19 @@ export default Component.extend({
       topic &&
       topic.tracked_posts &&
       topic.tracked_posts
-        .filter((p) => {
+        .slice()
+        .reverse()
+        .find((p) => {
           return (
-            p.post_number < this.currentPostNumber &&
+            p.post_number < this.postId &&
             stream.includes(postStream.findPostIdForPostNumber(p.post_number))
           );
         })
-        .pop()
     );
-  },
+  }
 
   getNextTrackedPost() {
-    const topic = this.topic;
+    const topic = this.args.topic;
     const postStream = topic.get("postStream");
     const stream = postStream.get("stream");
 
@@ -59,68 +40,70 @@ export default Component.extend({
       topic.tracked_posts &&
       topic.tracked_posts.find((p) => {
         return (
-          p.post_number > this.currentPostNumber &&
+          p.post_number > this.postId &&
           stream.includes(postStream.findPostIdForPostNumber(p.post_number))
         );
       })
     );
-  },
+  }
 
-  @discourseComputed("topic", "currentPostNumber")
-  nextTrackedPostGroup(topic) {
-    const nextTrackedPost = this.getNextTrackedPost(topic);
+  get nextTrackedPostGroup() {
+    const nextTrackedPost = this.getNextTrackedPost();
     return nextTrackedPost ? nextTrackedPost.group : null;
-  },
+  }
 
-  @discourseComputed("nextTrackedPostGroup")
-  nextTrackerIcon(nextTrackedPostGroup) {
-    return groupTrackerIcon(nextTrackedPostGroup, this.site, this.siteSettings);
-  },
+  get nextTrackerIcon() {
+    return groupTrackerIcon(
+      this.nextTrackedPostGroup,
+      this.site,
+      this.siteSettings
+    );
+  }
 
-  @discourseComputed("nextTrackedPostGroup", "currentPostNumber")
-  nextTrackedPostDisabled(nextTrackedPostGroup) {
-    return nextTrackedPostGroup === null;
-  },
+  get nextTrackedPostDisabled() {
+    return this.nextTrackedPostGroup === null;
+  }
 
-  @discourseComputed("nextTrackedPostGroup", "prevTrackedPostGroup")
-  group_tracker_posts_exists(nextTrackedPostGroup, prevTrackedPostGroup) {
-    return nextTrackedPostGroup !== null || prevTrackedPostGroup !== null;
-  },
+  get groupTrackerPostsExist() {
+    return (
+      this.nextTrackedPostGroup !== null || this.prevTrackedPostGroup !== null
+    );
+  }
 
-  @discourseComputed("topic", "currentPostNumber")
-  prevTrackedPostGroup(topic) {
-    const prevTrackedPost = this.getPreviousTrackedPost(topic);
+  get prevTrackedPostGroup() {
+    const prevTrackedPost = this.getPreviousTrackedPost();
     return prevTrackedPost ? prevTrackedPost.group : null;
-  },
+  }
 
-  @discourseComputed("prevTrackedPostGroup", "currentPostNumber")
-  prevTrackerIcon(prevTrackedPostGroup) {
-    return groupTrackerIcon(prevTrackedPostGroup, this.site, this.siteSettings);
-  },
+  get prevTrackerIcon() {
+    return groupTrackerIcon(
+      this.prevTrackedPostGroup,
+      this.site,
+      this.siteSettings
+    );
+  }
 
-  @discourseComputed("prevTrackedPostGroup", "currentPostNumber")
-  prevTrackedPostDisabled(prevTrackedPostGroup) {
-    return prevTrackedPostGroup === null;
-  },
+  get prevTrackedPostDisabled() {
+    return this.prevTrackedPostGroup === null;
+  }
 
-  actions: {
-    jumpToNextTrackedPost() {
-      const topic = this.topic;
-      const nextTrackedPost = this.getNextTrackedPost(topic);
+  @action
+  jumpToNextTrackedPost() {
+    const nextTrackedPost = this.getNextTrackedPost();
 
-      if (nextTrackedPost) {
-        const url = topic.url + "/" + nextTrackedPost.post_number;
-        DiscourseURL.routeTo(url);
-      }
-    },
-    jumpToPrevTrackedPost() {
-      const topic = this.topic;
-      const prevTrackedPost = this.getPreviousTrackedPost(topic);
+    if (nextTrackedPost) {
+      const url = this.args.topic.url + "/" + nextTrackedPost.post_number;
+      DiscourseURL.routeTo(url);
+    }
+  }
 
-      if (prevTrackedPost) {
-        const url = topic.url + "/" + prevTrackedPost.post_number;
-        DiscourseURL.routeTo(url);
-      }
-    },
-  },
-});
+  @action
+  jumpToPrevTrackedPost() {
+    const prevTrackedPost = this.getPreviousTrackedPost();
+
+    if (prevTrackedPost) {
+      const url = this.args.topic.url + "/" + prevTrackedPost.post_number;
+      DiscourseURL.routeTo(url);
+    }
+  }
+}

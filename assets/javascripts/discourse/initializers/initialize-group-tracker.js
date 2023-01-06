@@ -86,7 +86,7 @@ function addControlToTimeline(api) {
     jumpToFirstTrackedPost() {
       const { topic } = this.attrs;
       if (topic.first_tracked_post) {
-        DiscourseURL.jumpToPost(topic.firstTrackedPost.post_number);
+        DiscourseURL.jumpToPost(topic.first_tracked_post.post_number);
       }
     },
   });
