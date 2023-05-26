@@ -25,13 +25,13 @@
     <label for="tracked_post_icon">
       {{i18n "group_tracker.tracked_post_icon.label"}}
     </label>
-    {{text-field
-      name="tracked_post_icon"
-      value=group.tracked_post_icon
-      focus-out=(action "trackedPostIconChanged")
-      placeholderKey="group_tracker.tracked_post_icon.placeholder"
-      disabled=(if group.track_posts false true)
-    }}
+    <TextField
+      @name="tracked_post_icon"
+      @value={{group.tracked_post_icon}}
+      @focus-out={{action "trackedPostIconChanged"}}
+      @placeholderKey="group_tracker.tracked_post_icon.placeholder"
+      @disabled={{if group.track_posts false true}}
+    />
     <div class="control-instructions">
       {{i18n "group_tracker.tracked_post_icon.description"}}
     </div>
