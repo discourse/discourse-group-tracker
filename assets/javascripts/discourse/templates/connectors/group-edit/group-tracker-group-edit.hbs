@@ -5,7 +5,7 @@
       <Input
         @type="checkbox"
         @checked={{group.track_posts}}
-        @change={{action "trackPostsChanged" value="target.checked"}}
+        {{on "change" (action "trackPostsChanged" value="target.checked")}}
       />
       {{i18n "group_tracker.track_posts"}}
     </label>
@@ -14,8 +14,11 @@
       <Input
         @type="checkbox"
         @checked={{group.add_to_navigation_bar}}
-        @disabled={{if group.track_posts false true}}
-        @change={{action "addToNavigationBarChanged" value="target.checked"}}
+        disabled={{if group.track_posts false true}}
+        {{on
+          "change"
+          (action "addToNavigationBarChanged" value="target.checked")
+        }}
       />
       {{i18n "group_tracker.add_to_navigation_bar"}}
     </label>
