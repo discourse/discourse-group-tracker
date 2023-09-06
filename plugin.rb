@@ -41,11 +41,11 @@ after_initialize do
     # GroupShowSerializer extends BasicGroup but in production mode the
     # child doesn't pick up the parent's changes.
     %i[basic_group group_show].each do |s|
-      add_to_serializer(s, attribute.to_sym, include_condition: -> do 
-                          object.custom_fields[GroupTracker::TRACK_POSTS]
-                        end) do
-        object.custom_fields[GroupTracker.key(attribute)]
-      end
+      add_to_serializer(
+        s,
+        attribute.to_sym,
+        include_condition: -> { object.custom_fields[GroupTracker::TRACK_POSTS] },
+      ) { object.custom_fields[GroupTracker.key(attribute)] }
     end
   end
 
@@ -103,21 +103,23 @@ after_initialize do
   register_topic_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
   add_preloaded_topic_list_custom_field(GroupTracker::TRACKED_POSTS)
 
-  add_to_serializer(:topic_list_item, :first_tracked_post, include_condition: -> do
-                      object.custom_fields[GroupTracker::TRACKED_POSTS].present?
-                    end) do
-    object.custom_fields[GroupTracker::TRACKED_POSTS]
-  end
+  add_to_serializer(
+    :topic_list_item,
+    :first_tracked_post,
+    include_condition: -> { object.custom_fields[GroupTracker::TRACKED_POSTS].present? },
+  ) { object.custom_fields[GroupTracker::TRACKED_POSTS] }
 
-  add_to_serializer(:topic_view, :first_tracked_post, include_condition: -> do
-                      object.topic.custom_fields[GroupTracker::TRACKED_POSTS].present?
-                    end) do
-    object.topic.custom_fields[GroupTracker::TRACKED_POSTS]
-  end
+  add_to_serializer(
+    :topic_view,
+    :first_tracked_post,
+    include_condition: -> { object.topic.custom_fields[GroupTracker::TRACKED_POSTS].present? },
+  ) { object.topic.custom_fields[GroupTracker::TRACKED_POSTS] }
 
-  add_to_serializer(:topic_view, :tracked_posts, include_condition: -> do
-                      object.topic.custom_fields[GroupTracker::TRACKED_POSTS].present?
-                    end) do
+  add_to_serializer(
+    :topic_view,
+    :tracked_posts,
+    include_condition: -> { object.topic.custom_fields[GroupTracker::TRACKED_POSTS].present? },
+  ) do
     tracked_posts = []
 
     tracked_posts << object.topic.custom_fields[GroupTracker::TRACKED_POSTS]
@@ -131,11 +133,11 @@ after_initialize do
     tracked_posts.compact
   end
 
-  add_to_serializer(:post, :next_tracked_post, include_condition: -> do
-                      post_custom_fields[GroupTracker::TRACKED_POSTS].present?
-                    end) do
-    post_custom_fields[GroupTracker::TRACKED_POSTS]
-  end
+  add_to_serializer(
+    :post,
+    :next_tracked_post,
+    include_condition: -> { post_custom_fields[GroupTracker::TRACKED_POSTS].present? },
+  ) { post_custom_fields[GroupTracker::TRACKED_POSTS] }
 
   register_post_custom_field_type(GroupTracker::OPTED_OUT, :boolean)
   register_post_custom_field_type(GroupTracker::TRACKED_POSTS, :json)
@@ -144,9 +146,11 @@ after_initialize do
     [GroupTracker::TRACKED_POSTS, GroupTracker::OPTED_OUT]
   end
 
-  add_to_serializer(:post, :opted_out, include_condition: -> do
-                      post_custom_fields[GroupTracker::OPTED_OUT]
-                    end) { post_custom_fields[GroupTracker::OPTED_OUT] }
+  add_to_serializer(
+    :post,
+    :opted_out,
+    include_condition: -> { post_custom_fields[GroupTracker::OPTED_OUT] },
+  ) { post_custom_fields[GroupTracker::OPTED_OUT] }
 
   add_permitted_post_create_param("opted_out")
 
