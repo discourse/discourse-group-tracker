@@ -90,37 +90,6 @@ function addOptOutToggle(api) {
     },
   });
 
-  api.modifyClass("controller:composer", {
-    pluginId: PLUGIN_ID,
-
-    @computed("model.action")
-    showOptOutToggle(action) {
-      if (!this.site.tracked_groups) {
-        return false;
-      }
-      if (!this.currentUser) {
-        return false;
-      }
-      if (!this.currentUser.primary_group_id) {
-        return false;
-      }
-      if (ALLOWED_COMPOSER_ACTIONS.indexOf(action) < 0) {
-        return false;
-      }
-      return (
-        this.site.tracked_groups
-          .map((g) => g.id)
-          .indexOf(this.currentUser.primary_group_id) >= 0
-      );
-    },
-
-    actions: {
-      togglePostTracking() {
-        this.toggleProperty("model.optedOut");
-      },
-    },
-  });
-
   api.modifyClass("model:post", {
     pluginId: PLUGIN_ID,
 
@@ -130,6 +99,43 @@ function addOptOutToggle(api) {
       if (composerController.get("model.optedOut")) {
         props.opted_out = true;
       }
+    },
+  });
+
+  const site = api.container.lookup("service:site");
+  const currentUser = api.container.lookup("service:current-user");
+  const composer = api.container.lookup("service:composer");
+
+  api.addComposerToolbarPopupMenuOption({
+    action: () => {
+      composer.toggleProperty("model.optedOut");
+    },
+    label: "group_tracker.opt_out.title",
+    icon: "unlink",
+    condition: () => {
+      const action = composer.model.action;
+
+      if (!site.tracked_groups) {
+        return false;
+      }
+
+      if (!currentUser) {
+        return false;
+      }
+
+      if (!currentUser.primary_group_id) {
+        return false;
+      }
+
+      if (ALLOWED_COMPOSER_ACTIONS.indexOf(action) < 0) {
+        return false;
+      }
+
+      return (
+        site.tracked_groups
+          .map((g) => g.id)
+          .indexOf(currentUser.primary_group_id) >= 0
+      );
     },
   });
 
