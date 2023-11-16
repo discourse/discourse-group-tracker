@@ -3,10 +3,10 @@
 require "rails_helper"
 
 describe "Group Tracking" do
-  let(:user) { Fabricate(:user) }
+  let(:user) { Fabricate(:user, refresh_auto_groups: true) }
   let(:admin) { Fabricate(:admin) }
-  let(:member1) { Fabricate(:user, primary_group: tracked_group, groups: [tracked_group]) }
-  let(:member2) { Fabricate(:user, primary_group: tracked_group, groups: [tracked_group]) }
+  let(:member1) { Fabricate(:user, primary_group: tracked_group, groups: [tracked_group], refresh_auto_groups: true) }
+  let(:member2) { Fabricate(:user, primary_group: tracked_group, groups: [tracked_group], refresh_auto_groups: true) }
 
   let(:tracked_group) do
     group = Fabricate(:group)
