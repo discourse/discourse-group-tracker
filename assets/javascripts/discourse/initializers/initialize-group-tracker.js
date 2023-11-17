@@ -138,13 +138,6 @@ function addOptOutToggle(api) {
       );
     },
   });
-
-  api.addToolbarPopupMenuOptionsCallback(() => ({
-    icon: "unlink",
-    label: "group_tracker.opt_out.title",
-    action: "togglePostTracking",
-    condition: "showOptOutToggle",
-  }));
 }
 
 export default {
