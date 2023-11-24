@@ -3,7 +3,7 @@ import computed from "discourse-common/utils/decorators";
 import Composer from "discourse/models/composer";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 import getURL from "discourse-common/lib/get-url";
-import { getOwner } from "discourse-common/lib/get-owner";
+import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 
 const PLUGIN_ID = "discourse-group-tracker";
 
@@ -94,7 +94,9 @@ function addOptOutToggle(api) {
     pluginId: PLUGIN_ID,
 
     beforeCreate(props) {
-      const composerController = getOwner(this).lookup("controller:composer");
+      const composerController = getOwnerWithFallback(this).lookup(
+        "controller:composer"
+      );
 
       if (composerController.get("model.optedOut")) {
         props.opted_out = true;
