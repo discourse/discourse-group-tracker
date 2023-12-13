@@ -1,9 +1,9 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import computed from "discourse-common/utils/decorators";
 import Composer from "discourse/models/composer";
-import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
-import getURL from "discourse-common/lib/get-url";
 import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
+import getURL from "discourse-common/lib/get-url";
+import computed from "discourse-common/utils/decorators";
+import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 
 const PLUGIN_ID = "discourse-group-tracker";
 

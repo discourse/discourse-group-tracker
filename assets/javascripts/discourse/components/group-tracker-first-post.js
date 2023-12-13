@@ -1,7 +1,7 @@
-import { action } from "@ember/object";
 import Component from "@glimmer/component";
-import DiscourseURL from "discourse/lib/url";
+import { action } from "@ember/object";
 import { readOnly } from "@ember/object/computed";
+import DiscourseURL from "discourse/lib/url";
 
 export default class GroupTrackerFirstPost extends Component {
   @readOnly("args.topic.currentPost") postId;
