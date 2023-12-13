@@ -1,9 +1,9 @@
-import { action } from "@ember/object";
 import Component from "@glimmer/component";
-import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
-import DiscourseURL from "discourse/lib/url";
-import { inject as service } from "@ember/service";
+import { action } from "@ember/object";
 import { alias } from "@ember/object/computed";
+import { inject as service } from "@ember/service";
+import DiscourseURL from "discourse/lib/url";
+import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 
 export default class GroupTrackerNav extends Component {
   @service site;
