@@ -37,7 +37,7 @@ function addTrackedGroupToTopicList(api) {
 }
 
 function addNavigationBarItems(api) {
-  const { tracked_groups } = api.container.lookup("site:main");
+  const { tracked_groups } = api.container.lookup("service:site");
 
   if (!tracked_groups) {
     return;
