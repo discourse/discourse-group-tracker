@@ -3,7 +3,7 @@
 class TrackedGroupSerializer < ApplicationSerializer
   attributes :id, :name, :full_name
 
-  %w[add_to_navigation_bar tracked_post_icon].each do |attribute|
+  %w[add_to_navigation_bar track_priority_group tracked_post_icon].each do |attribute|
     attributes(attribute.to_sym)
 
     define_method(attribute) { object.custom_fields[GroupTracker.key(attribute)] }

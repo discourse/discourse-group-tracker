@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GroupTracker
-  GROUP_ATTRIBUTES ||= %w[track_posts add_to_navigation_bar tracked_post_icon]
+  GROUP_ATTRIBUTES ||= %w[track_posts track_priority_group add_to_navigation_bar tracked_post_icon]
 
   def self.key(name)
     "group_tracker_#{name}"
@@ -10,6 +10,7 @@ module GroupTracker
   OPTED_OUT ||= key("opted_out")
   TRACK_POSTS ||= key("track_posts")
   TRACKED_POSTS ||= key("tracked_posts")
+  PRIORITY_GROUP ||= key("track_priority_group")
 
   def self.tracked_group_ids
     GroupCustomField.where(name: TRACK_POSTS, value: "t").pluck(:group_id)
@@ -24,7 +25,11 @@ module GroupTracker
 
   def self.update_tracking!(topic_id = nil)
     Scheduler::Defer.later "Updating tracked posts" do
-      update_tracking_on_topics!(topic_id)
+      # if SiteSetting.group_tracker_priority_group
+        # update_tracking_on_topic_for_preferred_group!(topic_id)
+      # else
+        update_tracking_on_topics!(topic_id)
+      # end
       update_tracking_posts!(topic_id)
     end
   end
@@ -93,6 +98,74 @@ module GroupTracker
       tracked_group_ids: tracked_group_ids,
       opted_out_name: key("opted_out"),
       custom_field_name: key("tracked_posts"),
+    )
+  end
+
+  def self.update_tracking_on_topic_for_preferred_group!(topic_id = nil)
+    builder = DB.build <<~SQL
+    WITH "tracked_posts" AS (
+        SELECT p.topic_id
+             , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id DESC) "row"
+             , p.post_number
+             , p.id "post_id"
+             , u.primary_group_id "group_id"
+          FROM "posts" p
+          JOIN "users" u  ON u.id = p.user_id
+          JOIN "topics" t ON t.id = p.topic_id
+     LEFT JOIN "post_custom_fields" pcf ON pcf.post_id = p.id AND pcf.name = :opted_out_name
+         /*where*/
+      ORDER BY p.topic_id, p.id
+    ), "tracked_data" AS (
+         SELECT topic_id, json_build_object('group', g.name, 'post_number', post_number)::text "data"
+          FROM "tracked_posts"
+          JOIN "groups" g ON g.id = group_id
+          LEFT JOIN "group_custom_fields" gcf ON gcf.group_id = g.id
+         WHERE "row" = 1 AND gcf.name = :priority_group_name AND gcf.value = 't'
+    ), "cleaned_topics" AS (
+        DELETE
+          FROM "topic_custom_fields"
+         /*where2*/
+    ), "updated_topics" AS (
+         UPDATE "topic_custom_fields" AS tcf
+            SET "value" = td.data, updated_at = now()
+           FROM "tracked_data" td
+          WHERE tcf.topic_id = td.topic_id
+            AND tcf.name = :custom_field_name
+            AND tcf.value <> td.data
+      RETURNING tcf.topic_id
+    )
+    UPDATE "topic_custom_fields" AS tcf
+    SET "value" = td.data, updated_at = now()
+    FROM "tracked_data" td
+    WHERE tcf.topic_id = td.topic_id
+      AND tcf.name = :custom_field_name
+      AND tcf.value <> td.data
+  SQL
+
+    builder.where <<~SQL
+    p.post_type IN (1, 2)
+    AND p.deleted_at IS NULL
+    AND t.archetype = 'regular'
+    AND t.deleted_at IS NULL
+    AND u.id > 0
+    AND u.primary_group_id IN (:tracked_group_ids)
+    AND (pcf.value IS NULL OR pcf.value <> 't')
+  SQL
+
+    builder.where2("name = :custom_field_name")
+
+    if topic_id
+      builder.where("p.topic_id = :topic_id", topic_id: topic_id)
+      builder.where2("'f'")
+    else
+      builder.where2("topic_id NOT IN (SELECT topic_id FROM tracked_data)")
+    end
+
+    builder.exec(
+      tracked_group_ids: tracked_group_ids,
+      opted_out_name: key("opted_out"),
+      custom_field_name: key("tracked_posts"),
+      priority_group_name: key("track_priority_group"),
     )
   end
 
