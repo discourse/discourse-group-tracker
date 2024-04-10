@@ -25,11 +25,11 @@ module GroupTracker
 
   def self.update_tracking!(topic_id = nil)
     Scheduler::Defer.later "Updating tracked posts" do
-      # if SiteSetting.group_tracker_priority_group
-        # update_tracking_on_topic_for_preferred_group!(topic_id)
-      # else
+      if SiteSetting.group_tracker_priority_group
+        update_tracking_on_topic_for_preferred_group!(topic_id)
+      else
         update_tracking_on_topics!(topic_id)
-      # end
+      end
       update_tracking_posts!(topic_id)
     end
   end
