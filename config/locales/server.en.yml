@@ -3,3 +3,4 @@ en:
     group_tracker_default_icon: "Name of the icon used by default."
     group_tracker_topic_icon: "Name of the icon used in the topics list."
     group_tracker_topic_icon_class: "Class of the icon used in the topics list."
+    group_tracker_priority_group: "Enable the use of tracked priority group"
