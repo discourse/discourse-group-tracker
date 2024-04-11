@@ -8,7 +8,3 @@ plugins:
   group_tracker_topic_icon_class:
     client: true
     default: ""
-  group_tracker_priority_group:
-    client: true
-    type: "boolean"
-    default: false

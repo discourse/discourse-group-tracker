@@ -139,8 +139,6 @@ describe "Group Tracking" do
     end
 
     context "when the group_tracker_priority_group setting is enabled" do
-      before { SiteSetting.group_tracker_priority_group = true }
-
       context "when the group is a priority group" do
         it "changes the group that the topic is tracking" do
           sign_in(member1)
@@ -229,8 +227,6 @@ describe "Group Tracking" do
     end
 
     context "when the group_tracker_priority_group setting is enabled" do
-      before { SiteSetting.group_tracker_priority_group = true }
-
       context "when the group is a priority group" do
         it "changes the group that the topic is tracking" do
           sign_in(admin)
@@ -353,11 +349,8 @@ describe "Group Tracking" do
     context "when the group_tracker_priority_group setting is enabled" do
       let!(:post4) { Fabricate(:post, topic: topic, user: priority_member) }
 
-      before { SiteSetting.group_tracker_priority_group = true }
-
       context "when the group is a priority group" do
         it "changes the group that the topic is tracking" do
-          
           sign_in(admin)
           post "/t/#{topic.id}/move-posts.json",
                params: {
