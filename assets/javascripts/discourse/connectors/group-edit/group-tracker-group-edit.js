@@ -1,15 +1,15 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { ajax } from "discourse/lib/ajax";
+import { action } from '@ember/object';
 import { inject as service } from "@ember/service";
+import { ajax } from "discourse/lib/ajax";
 export default class GroupTrackerGroupEdit extends Component {
   @service siteSettings;
   @tracked group = this.args.outletArgs.group ;
 
   update(group, name, value) {
     group.set(name, value);
-  
+
     return ajax(`/admin/groups/${group.id}/${name}`, {
       type: "PUT",
       data: group.getProperties(name),
@@ -23,12 +23,11 @@ export default class GroupTrackerGroupEdit extends Component {
 
   @action
   trackedPostPriorityGroup(value) {
-    debugger;
     if (!this.siteSettings.group_tracker_priority_group) {
       return;
     }
 
-    this.update(this.group, "track_priority_group", value);
+    this.update(this.group, "track_posts_with_priority", value);
   }
 
   @action

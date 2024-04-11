@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GroupTracker
-  GROUP_ATTRIBUTES ||= %w[track_posts track_priority_group add_to_navigation_bar tracked_post_icon]
+  GROUP_ATTRIBUTES ||= %w[track_posts track_posts_with_priority add_to_navigation_bar tracked_post_icon]
 
   def self.key(name)
     "group_tracker_#{name}"
@@ -10,7 +10,7 @@ module GroupTracker
   OPTED_OUT ||= key("opted_out")
   TRACK_POSTS ||= key("track_posts")
   TRACKED_POSTS ||= key("tracked_posts")
-  PRIORITY_GROUP ||= key("track_priority_group")
+  PRIORITY_GROUP ||= key("track_posts_with_priority")
 
   def self.tracked_group_ids
     GroupCustomField.where(name: TRACK_POSTS, value: "t").pluck(:group_id)
@@ -25,11 +25,18 @@ module GroupTracker
 
   def self.update_tracking!(topic_id = nil)
     Scheduler::Defer.later "Updating tracked posts" do
-      if SiteSetting.group_tracker_priority_group
+      if SiteSetting.group_tracker_priority_group && TopicCustomField.find_by(topic_id: topic_id)
         update_tracking_on_topic_for_preferred_group!(topic_id)
       else
         update_tracking_on_topics!(topic_id)
       end
+      update_tracking_posts!(topic_id)
+    end
+  end
+
+  def self.update_initial_tracking!(topic_id = nil)
+    Scheduler::Defer.later "Updating tracked posts" do
+      update_tracking_on_topics!(topic_id)
       update_tracking_posts!(topic_id)
     end
   end
@@ -165,7 +172,7 @@ module GroupTracker
       tracked_group_ids: tracked_group_ids,
       opted_out_name: key("opted_out"),
       custom_field_name: key("tracked_posts"),
-      priority_group_name: key("track_priority_group"),
+      priority_group_name: key("track_posts_with_priority"),
     )
   end
 
