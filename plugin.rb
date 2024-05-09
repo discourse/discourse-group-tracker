@@ -60,7 +60,7 @@ after_initialize do
     group.custom_fields[GroupTracker.key("track_posts")] = track_posts
     group.save
 
-    GroupTracker.update_initial_tracking!
+    GroupTracker.update_tracking!
 
     render json: success_json
   end
