@@ -138,55 +138,53 @@ describe "Group Tracking" do
       end
     end
 
-    context "when the group_tracker_priority_group setting is enabled" do
-      context "when the group is a priority group" do
-        it "changes the group that the topic is tracking" do
-          sign_in(member1)
-          post "/posts.json", params: { title: "Topic with tracked posts", raw: raw }
-          topic = Topic.last
+    context "when the group is a priority group" do
+      it "changes the group that the topic is tracking" do
+        sign_in(member1)
+        post "/posts.json", params: { title: "Topic with tracked posts", raw: raw }
+        topic = Topic.last
 
-          topic.reload
+        topic.reload
 
-          expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 1,
-          )
+        expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 1,
+        )
 
-          sign_in(priority_member)
-          post "/posts.json", params: { topic_id: topic.id, raw: raw }
+        sign_in(priority_member)
+        post "/posts.json", params: { topic_id: topic.id, raw: raw }
 
-          topic.reload
+        topic.reload
 
-          expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => priority_tracked_group.name,
-            "post_number" => 2,
-          )
-        end
+        expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => priority_tracked_group.name,
+          "post_number" => 2,
+        )
       end
+    end
 
-      context "when the group is not a priority group" do
-        it "does not changes the group that the topic is tracking" do
-          sign_in(member1)
-          post "/posts.json", params: { title: "Topic with tracked posts", raw: raw }
-          topic = Topic.last
+    context "when the group is not a priority group" do
+      it "does not changes the group that the topic is tracking" do
+        sign_in(member1)
+        post "/posts.json", params: { title: "Topic with tracked posts", raw: raw }
+        topic = Topic.last
 
-          topic.reload
+        topic.reload
 
-          expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 1,
-          )
+        expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 1,
+        )
 
-          sign_in(member3)
-          post "/posts.json", params: { topic_id: topic.id, raw: raw }
+        sign_in(member3)
+        post "/posts.json", params: { topic_id: topic.id, raw: raw }
 
-          topic.reload
+        topic.reload
 
-          expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 1,
-          )
-        end
+        expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 1,
+        )
       end
     end
   end
@@ -226,93 +224,91 @@ describe "Group Tracking" do
       expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
 
-    context "when the group_tracker_priority_group setting is enabled" do
-      context "when the group is a priority group" do
-        it "changes the group that the topic is tracking" do
-          sign_in(admin)
+    context "when the group is a priority group" do
+      it "changes the group that the topic is tracking" do
+        sign_in(admin)
 
-          # from a normal user to a tracked user
-          post "/t/#{topic.id}/change-owner.json",
-               params: {
-                 post_ids: [post1.id],
-                 username: member2.username,
-               }
+        # from a normal user to a tracked user
+        post "/t/#{topic.id}/change-owner.json",
+             params: {
+               post_ids: [post1.id],
+               username: member2.username,
+             }
 
-          # from a tracked user to a normal user
-          post "/t/#{topic.id}/change-owner.json",
-               params: {
-                 post_ids: [post3.id],
-                 username: user.username,
-               }
+        # from a tracked user to a normal user
+        post "/t/#{topic.id}/change-owner.json",
+             params: {
+               post_ids: [post3.id],
+               username: user.username,
+             }
 
-          expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 1,
-          )
-          expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 2,
-          )
+        expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 1,
+        )
+        expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 2,
+        )
 
-          expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
-          expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
+        expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
+        expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-          # from a tracked user to a priority group user
-          post "/t/#{topic.id}/change-owner.json",
-               params: {
-                 post_ids: [post3.id],
-                 username: priority_member.username,
-               }
+        # from a tracked user to a priority group user
+        post "/t/#{topic.id}/change-owner.json",
+             params: {
+               post_ids: [post3.id],
+               username: priority_member.username,
+             }
 
-          expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => priority_tracked_group.name,
-            "post_number" => 3,
-          )
-        end
+        expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => priority_tracked_group.name,
+          "post_number" => 3,
+        )
       end
+    end
 
-      context "when the group is not a priority group" do
-        it "does not changes the group that the topic is tracking" do
-          sign_in(admin)
+    context "when the group is not a priority group" do
+      it "does not changes the group that the topic is tracking" do
+        sign_in(admin)
 
-          # from a normal user to a tracked user
-          post "/t/#{topic.id}/change-owner.json",
-               params: {
-                 post_ids: [post1.id],
-                 username: member2.username,
-               }
+        # from a normal user to a tracked user
+        post "/t/#{topic.id}/change-owner.json",
+             params: {
+               post_ids: [post1.id],
+               username: member2.username,
+             }
 
-          # from a tracked user to a normal user
-          post "/t/#{topic.id}/change-owner.json",
-               params: {
-                 post_ids: [post3.id],
-                 username: user.username,
-               }
+        # from a tracked user to a normal user
+        post "/t/#{topic.id}/change-owner.json",
+             params: {
+               post_ids: [post3.id],
+               username: user.username,
+             }
 
-          expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 1,
-          )
-          expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 2,
-          )
+        expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 1,
+        )
+        expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 2,
+        )
 
-          expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
-          expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
+        expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
+        expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-          # from a tracked user to a priority group user
-          post "/t/#{topic.id}/change-owner.json",
-               params: {
-                 post_ids: [post3.id],
-                 username: member3.username,
-               }
+        # from a tracked user to a priority group user
+        post "/t/#{topic.id}/change-owner.json",
+             params: {
+               post_ids: [post3.id],
+               username: member3.username,
+             }
 
-          expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 1,
-          )
-        end
+        expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 1,
+        )
       end
     end
   end
@@ -322,6 +318,7 @@ describe "Group Tracking" do
     let!(:post1) { Fabricate(:post, topic: topic, user: user) }
     let!(:post2) { Fabricate(:post, topic: topic, user: member1) }
     let!(:post3) { Fabricate(:post, topic: topic, user: member2) }
+
     it "resets tracking data when a post is moved to another topic" do
       sign_in(admin)
       post "/t/#{topic.id}/move-posts.json",
@@ -346,37 +343,34 @@ describe "Group Tracking" do
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
 
-    context "when the group_tracker_priority_group setting is enabled" do
+    context "when the group is a priority group" do
       let!(:post4) { Fabricate(:post, topic: topic, user: priority_member) }
+      it "changes the group that the topic is tracking" do
+        sign_in(admin)
+        post "/t/#{topic.id}/move-posts.json",
+             params: {
+               post_ids: [post4.id],
+               title: "This is a valid destination topic title",
+             }
 
-      context "when the group is a priority group" do
-        it "changes the group that the topic is tracking" do
-          sign_in(admin)
-          post "/t/#{topic.id}/move-posts.json",
-               params: {
-                 post_ids: [post4.id],
-                 title: "This is a valid destination topic title",
-               }
+        destination_topic = Topic.last
 
-          destination_topic = Topic.last
+        expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 2,
+        )
+        expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
+        expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
 
-          expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 2,
-          )
-          expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
-          expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
+        expect(destination_topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => priority_tracked_group.name,
+          "post_number" => 1,
+        )
 
-          expect(destination_topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => priority_tracked_group.name,
-            "post_number" => 1,
-          )
-
-          expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
-            "group" => tracked_group.name,
-            "post_number" => 3,
-          )
-        end
+        expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+          "group" => tracked_group.name,
+          "post_number" => 3,
+        )
       end
     end
   end

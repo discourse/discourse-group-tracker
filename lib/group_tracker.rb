@@ -27,10 +27,8 @@ module GroupTracker
 
   def self.should_track?(post)
     post.user_id > 0 &&
-      (
-        post.post_type == Post.types[:regular] ||
-          post.post_type == Post.types[:moderator_action]
-      ) && post.archetype != Archetype.private_message && post.user.present? &&
+      (post.post_type == Post.types[:regular] || post.post_type == Post.types[:moderator_action]) &&
+      post.archetype != Archetype.private_message && post.user.present? &&
       tracked_group_ids.include?(post.user.primary_group_id)
   end
 
@@ -126,7 +124,7 @@ module GroupTracker
       tracked_group_ids: tracked_group_ids,
       priority_tracked_group_ids: priority_tracked_group_ids,
       opted_out_name: key("opted_out"),
-      custom_field_name: key("tracked_posts")
+      custom_field_name: key("tracked_posts"),
     )
   end
 
@@ -186,15 +184,13 @@ module GroupTracker
 
     if topic_id
       builder.where("p.topic_id = :topic_id", topic_id: topic_id)
-      builder.where2(
-        "post_id IN (SELECT id FROM posts WHERE topic_id = :topic_id)"
-      )
+      builder.where2("post_id IN (SELECT id FROM posts WHERE topic_id = :topic_id)")
     end
 
     builder.exec(
       tracked_group_ids: tracked_group_ids,
       opted_out_name: key("opted_out"),
-      custom_field_name: key("tracked_posts")
+      custom_field_name: key("tracked_posts"),
     )
   end
 end
