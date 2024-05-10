@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 module GroupTracker
-  GROUP_ATTRIBUTES ||= %w[track_posts add_to_navigation_bar tracked_post_icon]
+  GROUP_ATTRIBUTES ||= %w[
+    track_posts
+    track_posts_with_priority
+    add_to_navigation_bar
+    tracked_post_icon
+  ]
 
   def self.key(name)
     "group_tracker_#{name}"
@@ -10,6 +15,11 @@ module GroupTracker
   OPTED_OUT ||= key("opted_out")
   TRACK_POSTS ||= key("track_posts")
   TRACKED_POSTS ||= key("tracked_posts")
+  PRIORITY_GROUP ||= key("track_posts_with_priority")
+
+  def self.priority_tracked_group_ids
+    GroupCustomField.where(name: PRIORITY_GROUP, value: "t").pluck(:group_id)
+  end
 
   def self.tracked_group_ids
     GroupCustomField.where(name: TRACK_POSTS, value: "t").pluck(:group_id)
@@ -33,7 +43,7 @@ module GroupTracker
 
   def self.update_tracking_on_topics!(topic_id = nil)
     builder = DB.build <<~SQL
-        WITH "tracked_posts" AS (
+        WITH "tracked_posts_priority" AS (
             SELECT p.topic_id
                  , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
                  , p.post_number
@@ -44,7 +54,28 @@ module GroupTracker
               JOIN "topics" t ON t.id = p.topic_id
          LEFT JOIN "post_custom_fields" pcf ON pcf.post_id = p.id AND pcf.name = :opted_out_name
              /*where*/
+             AND u.primary_group_id IN (:priority_tracked_group_ids)
           ORDER BY p.topic_id, p.id
+), "tracked_posts_low_priority" AS (
+            SELECT p.topic_id
+                 , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
+                 , p.post_number
+                 , p.id "post_id"
+                 , u.primary_group_id "group_id"
+              FROM "posts" p
+              JOIN "users" u  ON u.id = p.user_id
+              JOIN "topics" t ON t.id = p.topic_id
+         LEFT JOIN "post_custom_fields" pcf ON pcf.post_id = p.id AND pcf.name = :opted_out_name
+             /*where*/
+        	    AND NOT EXISTS(
+        			SELECT pri.topic_id
+        			FROM tracked_posts_priority pri
+        			WHERE pri.topic_id = t.id
+        		)
+          ORDER BY p.topic_id, p.id
+        ), "tracked_posts" AS (
+          SELECT * FROM tracked_posts_priority
+          UNION SELECT * FROM tracked_posts_low_priority
         ), "tracked_data" AS (
             SELECT topic_id, json_build_object('group', name, 'post_number', post_number)::text "data"
               FROM "tracked_posts"
@@ -91,6 +122,7 @@ module GroupTracker
 
     builder.exec(
       tracked_group_ids: tracked_group_ids,
+      priority_tracked_group_ids: priority_tracked_group_ids,
       opted_out_name: key("opted_out"),
       custom_field_name: key("tracked_posts"),
     )

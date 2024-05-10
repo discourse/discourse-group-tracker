@@ -15,6 +15,10 @@ after_initialize do
   Discourse::Application.routes.append do
     namespace :admin, constraints: AdminConstraint.new do
       put "groups/:id/track_posts" => "groups#update_track_posts", :constraints => { id: /\d+/ }
+      put "groups/:id/track_posts_with_priority" => "groups#update_priority_group",
+          :constraints => {
+            id: /\d+/,
+          }
       put "groups/:id/add_to_navigation_bar" => "groups#update_add_to_navigation_bar",
           :constraints => {
             id: /\d+/,
@@ -27,6 +31,7 @@ after_initialize do
   end
 
   register_group_custom_field_type(GroupTracker.key("track_posts"), :boolean)
+  register_group_custom_field_type(GroupTracker.key("track_posts_with_priority"), :boolean)
   register_group_custom_field_type(GroupTracker.key("add_to_navigation_bar"), :boolean)
 
   register_svg_icon "arrow-circle-up" if respond_to?(:register_svg_icon)
@@ -56,6 +61,16 @@ after_initialize do
     group.save
 
     GroupTracker.update_tracking!
+
+    render json: success_json
+  end
+
+  add_to_class(Admin::GroupsController, :update_priority_group) do
+    track_posts = params[:track_posts_with_priority] == "true"
+
+    group = Group.find(params[:id])
+    group.custom_fields[GroupTracker.key("track_posts_with_priority")] = track_posts
+    group.save
 
     render json: success_json
   end

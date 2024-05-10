@@ -2,6 +2,7 @@ en:
   js:
     group_tracker:
       track_posts: "Track posts made by members of this group"
+      track_posts_with_priority: "Display this group's icon in the topic list even when another tracked group user has replied first."
       add_to_navigation_bar: "Add to navigation bar"
 
       tracked_post_icon:
