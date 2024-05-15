@@ -43,20 +43,19 @@ module GroupTracker
 
   def self.update_tracking_on_topics!(topic_id = nil)
     builder = DB.build <<~SQL
-        WITH
-"first_tracked_post_number" AS (
-SELECT p.topic_id
-, row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
-, p.post_number
-, p.id "post_id"
-, u.primary_group_id "group_id"
-FROM "posts" p
-JOIN "users" u  ON u.id = p.user_id
-JOIN "topics" t ON t.id = p.topic_id
-LEFT JOIN "post_custom_fields" pcf ON pcf.post_id = p.id AND pcf.name = :opted_out_name
-/*where*/
-ORDER BY p.topic_id, p.id
-), "tracked_posts_priority" AS (
+        WITH "first_tracked_post_number" AS (
+            SELECT p.topic_id
+                 , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
+                 , p.post_number
+                 , p.id "post_id"
+                 , u.primary_group_id "group_id"
+              FROM "posts" p
+              JOIN "users" u  ON u.id = p.user_id
+              JOIN "topics" t ON t.id = p.topic_id
+              LEFT JOIN "post_custom_fields" pcf ON pcf.post_id = p.id AND pcf.name = :opted_out_name
+              /*where*/
+              ORDER BY p.topic_id, p.id
+            ), "tracked_posts_priority" AS (
             SELECT p.topic_id
                  , row_number() OVER (PARTITION BY p.topic_id ORDER BY p.topic_id, p.id) "row"
                  , p.post_number
