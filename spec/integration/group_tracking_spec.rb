@@ -83,6 +83,7 @@ describe "Group Tracking" do
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => group.name,
         "post_number" => 1,
+        "jump_target" => 1,
       )
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => group.name,
@@ -126,6 +127,7 @@ describe "Group Tracking" do
       expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 2,
+        "jump_target" => 2,
       )
 
       expect(topic.ordered_posts[1].custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
@@ -149,6 +151,7 @@ describe "Group Tracking" do
         expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
           "post_number" => 1,
+          "jump_target" => 1,
         )
 
         sign_in(priority_member)
@@ -159,6 +162,7 @@ describe "Group Tracking" do
         expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => priority_tracked_group.name,
           "post_number" => 2,
+          "jump_target" => 1,
         )
       end
     end
@@ -174,6 +178,7 @@ describe "Group Tracking" do
         expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
           "post_number" => 1,
+          "jump_target" => 1,
         )
 
         sign_in(member3)
@@ -184,6 +189,7 @@ describe "Group Tracking" do
         expect(topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
           "post_number" => 1,
+          "jump_target" => 1,
         )
       end
     end
@@ -215,6 +221,7 @@ describe "Group Tracking" do
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 1,
+        "jump_target" => 1,
       )
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
@@ -245,6 +252,7 @@ describe "Group Tracking" do
         expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
           "post_number" => 1,
+          "jump_target" => 1,
         )
         expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
@@ -264,6 +272,7 @@ describe "Group Tracking" do
         expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => priority_tracked_group.name,
           "post_number" => 3,
+          "jump_target" => 1,
         )
       end
     end
@@ -289,6 +298,7 @@ describe "Group Tracking" do
         expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
           "post_number" => 1,
+          "jump_target" => 1,
         )
         expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
@@ -308,6 +318,7 @@ describe "Group Tracking" do
         expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
           "post_number" => 1,
+          "jump_target" => 1,
         )
       end
     end
@@ -332,6 +343,7 @@ describe "Group Tracking" do
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 3,
+        "jump_target" => 3,
       )
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
@@ -339,6 +351,7 @@ describe "Group Tracking" do
       expect(destination_topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 1,
+        "jump_target" => 1,
       )
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
@@ -358,6 +371,7 @@ describe "Group Tracking" do
         expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => tracked_group.name,
           "post_number" => 2,
+          "jump_target" => 2,
         )
         expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
         expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
@@ -365,6 +379,7 @@ describe "Group Tracking" do
         expect(destination_topic.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
           "group" => priority_tracked_group.name,
           "post_number" => 1,
+          "jump_target" => 1,
         )
 
         expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
@@ -388,6 +403,7 @@ describe "Group Tracking" do
       expect(topic.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 3,
+        "jump_target" => 3,
       )
       expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
@@ -421,6 +437,7 @@ describe "Group Tracking" do
       expect(topic1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 1,
+        "jump_target" => 1,
       )
       expect(post1_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
@@ -432,6 +449,7 @@ describe "Group Tracking" do
       expect(topic2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 1,
+        "jump_target" => 1,
       )
       expect(post2_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
@@ -452,6 +470,7 @@ describe "Group Tracking" do
       expect(topic2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
         "group" => tracked_group.name,
         "post_number" => 2,
+        "jump_target" => 2,
       )
       expect(post2_1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
       expect(post2_2.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
