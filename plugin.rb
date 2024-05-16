@@ -9,8 +9,8 @@
 register_asset "stylesheets/group-tracker.scss"
 
 after_initialize do
-  load File.expand_path("../lib/group_tracker.rb", __FILE__)
-  load File.expand_path("../app/serializers/tracked_group_serializer.rb", __FILE__)
+  require_relative "lib/group_tracker"
+  require_relative "app/serializers/tracked_group_serializer"
 
   Discourse::Application.routes.append do
     namespace :admin, constraints: AdminConstraint.new do
@@ -93,10 +93,8 @@ after_initialize do
     render json: success_json
   end
 
-  TRACKED_GROUPS ||= "tracked_groups".freeze
-
   add_to_serializer(:site, :tracked_groups) do
-    cache_fragment(TRACKED_GROUPS) do
+    cache_fragment(GroupTracker::TRACKED_GROUPS) do
       tracked_groups = Group.where(id: GroupTracker.tracked_group_ids)
       Group.preload_custom_fields(tracked_groups, Group.preloaded_custom_field_names)
       ActiveModel::ArraySerializer.new(
@@ -107,11 +105,11 @@ after_initialize do
   end
 
   add_model_callback(Group, :after_save) do
-    ApplicationSerializer.expire_cache_fragment!(TRACKED_GROUPS)
+    ApplicationSerializer.expire_cache_fragment!(GroupTracker::TRACKED_GROUPS)
   end
 
   add_model_callback(Group, :after_destroy) do
-    ApplicationSerializer.expire_cache_fragment!(TRACKED_GROUPS)
+    ApplicationSerializer.expire_cache_fragment!(GroupTracker::TRACKED_GROUPS)
   end
 
   register_topic_custom_field_type(GroupTracker::TRACKED_POSTS, :json)

@@ -16,6 +16,7 @@ module GroupTracker
   TRACK_POSTS ||= key("track_posts")
   TRACKED_POSTS ||= key("tracked_posts")
   PRIORITY_GROUP ||= key("track_posts_with_priority")
+  TRACKED_GROUPS ||= "tracked_groups"
 
   def self.priority_tracked_group_ids
     GroupCustomField.where(name: PRIORITY_GROUP, value: "t").pluck(:group_id)
