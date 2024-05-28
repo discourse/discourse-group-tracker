@@ -189,7 +189,7 @@ after_initialize do
 
     primary_group_ids = User.where(id: user_ids).pluck(:primary_group_id)
 
-    next unless (GroupTracker.tracked_group_ids & primary_group_ids).present?
+    next if (GroupTracker.tracked_group_ids & primary_group_ids).blank?
 
     GroupTracker.update_tracking!(post.topic_id)
 
@@ -218,7 +218,7 @@ after_initialize do
     next unless primary_group_ids = self.previous_changes["primary_group_id"]
 
     # ... and only if either is tracked
-    next unless (GroupTracker.tracked_group_ids & primary_group_ids).present?
+    next if (GroupTracker.tracked_group_ids & primary_group_ids).blank?
 
     GroupTracker.update_tracking!
   end
