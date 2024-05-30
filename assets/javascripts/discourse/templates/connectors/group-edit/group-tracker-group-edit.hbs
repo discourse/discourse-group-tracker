@@ -11,17 +11,19 @@
       {{i18n "group_tracker.track_posts"}}
     </label>
 
-    <label>
-      <Input
-        @type="checkbox"
-        @checked={{group.track_posts_with_priority}}
-        {{on
-          "change"
-          (action this.trackedPostPriorityGroup value="target.checked")
-        }}
-      />
-      {{i18n "group_tracker.track_posts_with_priority"}}
-    </label>
+    {{#if group.track_posts}}
+      <label>
+        <Input
+          @type="checkbox"
+          @checked={{group.track_posts_with_priority}}
+          {{on
+            "change"
+            (action this.trackedPostPriorityGroup value="target.checked")
+          }}
+        />
+        {{i18n "group_tracker.track_posts_with_priority"}}
+      </label>
+    {{/if}}
 
     <label>
       <Input
