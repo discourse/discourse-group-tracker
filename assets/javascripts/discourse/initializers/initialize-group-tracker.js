@@ -94,9 +94,8 @@ function addOptOutToggle(api) {
     pluginId: PLUGIN_ID,
 
     beforeCreate(props) {
-      const composerController = getOwnerWithFallback(this).lookup(
-        "controller:composer"
-      );
+      const composerController =
+        getOwnerWithFallback(this).lookup("service:composer");
 
       if (composerController.get("model.optedOut")) {
         props.opted_out = true;
