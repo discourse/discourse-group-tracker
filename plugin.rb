@@ -34,7 +34,7 @@ after_initialize do
   register_group_custom_field_type(GroupTracker.key("track_posts_with_priority"), :boolean)
   register_group_custom_field_type(GroupTracker.key("add_to_navigation_bar"), :boolean)
 
-  register_svg_icon "arrow-circle-up" if respond_to?(:register_svg_icon)
+  register_svg_icon "circle-arrow-up" if respond_to?(:register_svg_icon)
   register_svg_icon "crown" if respond_to?(:register_svg_icon)
   register_svg_icon "arrow-right" if respond_to?(:register_svg_icon)
   register_svg_icon "arrow-left" if respond_to?(:register_svg_icon)
