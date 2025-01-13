@@ -1,5 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import Composer from "discourse/models/composer";
+import { withSilencedDeprecations } from "discourse-common/lib/deprecated";
 import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 import getURL from "discourse-common/lib/get-url";
 import computed from "discourse-common/utils/decorators";
@@ -20,19 +21,32 @@ function modifyTopicModel(api) {
 }
 
 function addTrackedGroupToTopicList(api) {
-  api.modifyClass("component:topic-list-item", {
-    pluginId: PLUGIN_ID,
-
-    @computed("topic.first_tracked_post")
-    unboundClassNames(firstTrackedPost) {
-      let classNames = this._super();
-
+  api.registerValueTransformer(
+    "topic-list-item-class",
+    ({ value: classNames, context }) => {
+      const firstTrackedPost = context.topic.first_tracked_post;
       if (firstTrackedPost) {
-        classNames += ` group-${firstTrackedPost.group}`;
+        classNames.push(`group-${firstTrackedPost.group}`);
       }
-
       return classNames;
-    },
+    }
+  );
+
+  withSilencedDeprecations("discourse.hbr-topic-list-overrides", () => {
+    api.modifyClass("component:topic-list-item", {
+      pluginId: PLUGIN_ID,
+
+      @computed("topic.first_tracked_post")
+      unboundClassNames(firstTrackedPost) {
+        let classNames = this._super();
+
+        if (firstTrackedPost) {
+          classNames += ` group-${firstTrackedPost.group}`;
+        }
+
+        return classNames;
+      },
+    });
   });
 }
 
