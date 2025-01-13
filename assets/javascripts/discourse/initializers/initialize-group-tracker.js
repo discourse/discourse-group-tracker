@@ -9,15 +9,17 @@ import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/grou
 const PLUGIN_ID = "discourse-group-tracker";
 
 function modifyTopicModel(api) {
-  api.modifyClass("model:topic", {
-    pluginId: PLUGIN_ID,
-
-    // used in the 'topic-list-before-status' connector
-    @computed("first_tracked_post.group")
-    firstTrackedPostIcon(group) {
-      return groupTrackerIcon(group, this.site, this.siteSettings);
-    },
-  });
+  api.modifyClass(
+    "model:topic",
+    (Superclass) =>
+      class extends Superclass {
+        // used in the 'topic-list-before-status' connector
+        @computed("first_tracked_post.group")
+        firstTrackedPostIcon(group) {
+          return groupTrackerIcon(group, this.site, this.siteSettings);
+        }
+      }
+  );
 }
 
 function addTrackedGroupToTopicList(api) {
@@ -33,20 +35,22 @@ function addTrackedGroupToTopicList(api) {
   );
 
   withSilencedDeprecations("discourse.hbr-topic-list-overrides", () => {
-    api.modifyClass("component:topic-list-item", {
-      pluginId: PLUGIN_ID,
+    api.modifyClass(
+      "component:topic-list-item",
+      (Superclass) =>
+        class extends Superclass {
+          @computed("topic.first_tracked_post")
+          unboundClassNames(firstTrackedPost) {
+            let classNames = super.unboundClassNames;
 
-      @computed("topic.first_tracked_post")
-      unboundClassNames(firstTrackedPost) {
-        let classNames = this._super();
+            if (firstTrackedPost) {
+              classNames += ` group-${firstTrackedPost.group}`;
+            }
 
-        if (firstTrackedPost) {
-          classNames += ` group-${firstTrackedPost.group}`;
+            return classNames;
+          }
         }
-
-        return classNames;
-      },
-    });
+    );
   });
 }
 
@@ -86,36 +90,35 @@ function addOptOutToggle(api) {
     classNameBindings: ["composer.optedOut"],
   });
 
-  api.modifyClass("model:composer", {
-    pluginId: PLUGIN_ID,
+  api.modifyClass(
+    "model:composer",
+    (Superclass) =>
+      class extends Superclass {
+        groupTrackerOptOut(opts) {
+          this.set("optedOut", opts.post && opts.post.opted_out);
+        }
 
-    groupTrackerOptOut(opts) {
-      this.set("optedOut", opts.post && opts.post.opted_out);
-    },
-    open(opts) {
-      opts = opts || {};
-      let promise = this._super(opts);
-      // Discourse 2.4.0 sets options directly, 2.5.0 relies on promises
-      // TODO: drop the non-promise code once promises are supported in stable
-      if (promise) {
-        return promise.then(() => this.groupTrackerOptOut(opts));
+        open(opts) {
+          opts = opts || {};
+          return super.open(opts).then(() => this.groupTrackerOptOut(opts));
+        }
       }
-      this.groupTrackerOptOut(opts);
-    },
-  });
+  );
 
-  api.modifyClass("model:post", {
-    pluginId: PLUGIN_ID,
+  api.modifyClass(
+    "model:post",
+    (Superclass) =>
+      class extends Superclass {
+        beforeCreate(props) {
+          const composerController =
+            getOwnerWithFallback(this).lookup("service:composer");
 
-    beforeCreate(props) {
-      const composerController =
-        getOwnerWithFallback(this).lookup("service:composer");
-
-      if (composerController.get("model.optedOut")) {
-        props.opted_out = true;
+          if (composerController.get("model.optedOut")) {
+            props.opted_out = true;
+          }
+        }
       }
-    },
-  });
+  );
 
   const site = api.container.lookup("service:site");
   const currentUser = api.container.lookup("service:current-user");
