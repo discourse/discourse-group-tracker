@@ -5,13 +5,12 @@ import I18n from "discourse-i18n";
 
 export default class GroupTrackerTopicStatus extends Component {
   @service site;
-
-  context = this.args.context;
+  @service siteSettings;
 
   get titleName() {
     const trackedGroups = this.site && this.site.tracked_groups;
     const trackedGroup = trackedGroups.find(
-      (g) => g.name === this.context.topic.first_tracked_post.group
+      (g) => g.name === this.args.topic.first_tracked_post.group
     );
     let title = "";
 
@@ -27,28 +26,25 @@ export default class GroupTrackerTopicStatus extends Component {
 
   <template>
     <span class="topic-icon-container">
-      {{#if this.context.topic.first_tracked_post}}
+      {{#if @topic.first_tracked_post}}
         <a
-          class="tracked-post group-{{this.context.topic.first_tracked_post.group}}"
-          href="{{this.context.topic.url}}/{{this.context.topic.first_tracked_post.post_number}}"
+          class="tracked-post group-{{@topic.first_tracked_post.group}}"
+          href="{{@topic.url}}/{{@topic.first_tracked_post.post_number}}"
           title={{this.titleName}}
         >
-          {{icon
-            this.context.topic.firstTrackedPostIcon
-            class="first-tracked-post"
-          }}
-          {{#if this.context.siteSettings.group_tracker_topic_icon}}
+          {{icon @topic.firstTrackedPostIcon class="first-tracked-post"}}
+          {{#if this.siteSettings.group_tracker_topic_icon}}
             {{icon
-              this.context.siteSettings.group_tracker_topic_icon
-              class=this.context.siteSettings.group_tracker_topic_icon_class
+              this.siteSettings.group_tracker_topic_icon
+              class=this.siteSettings.group_tracker_topic_icon_class
             }}
           {{/if}}
         </a>
       {{else}}
-        {{#if this.context.siteSettings.group_tracker_topic_icon}}
+        {{#if this.siteSettings.group_tracker_topic_icon}}
           {{icon
-            this.context.siteSettings.group_tracker_topic_icon
-            class=this.context.siteSettings.group_tracker_topic_icon_class
+            this.siteSettings.group_tracker_topic_icon
+            class=this.siteSettings.group_tracker_topic_icon_class
           }}
         {{/if}}
       {{/if}}
