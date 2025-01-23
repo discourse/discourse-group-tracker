@@ -129,7 +129,7 @@ function addOptOutToggle(api) {
       composer.toggleProperty("model.optedOut");
     },
     label: "group_tracker.opt_out.title",
-    icon: "unlink",
+    icon: "link-slash",
     condition: () => {
       const action = composer.model.action;
 
