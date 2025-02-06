@@ -1,9 +1,9 @@
+import computed from "discourse/lib/decorators";
+import { withSilencedDeprecations } from "discourse/lib/deprecated";
+import { getOwnerWithFallback } from "discourse/lib/get-owner";
+import getURL from "discourse/lib/get-url";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import Composer from "discourse/models/composer";
-import { withSilencedDeprecations } from "discourse-common/lib/deprecated";
-import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
-import getURL from "discourse-common/lib/get-url";
-import computed from "discourse-common/utils/decorators";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 
 const PLUGIN_ID = "discourse-group-tracker";
