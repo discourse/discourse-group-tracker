@@ -1,7 +1,7 @@
 import Component from "@glimmer/component";
 import { service } from "@ember/service";
-import icon from "discourse-common/helpers/d-icon";
-import I18n from "discourse-i18n";
+import icon from "discourse/helpers/d-icon";
+import { i18n } from "discourse-i18n";
 
 export default class GroupTrackerTopicStatus extends Component {
   @service site;
@@ -18,7 +18,7 @@ export default class GroupTrackerTopicStatus extends Component {
       const name = trackedGroup.full_name
         ? trackedGroup.full_name
         : trackedGroup.name;
-      title = I18n.t("group_tracker.first_group_post", { group: name });
+      title = i18n("group_tracker.first_group_post", { group: name });
     }
 
     return title;
