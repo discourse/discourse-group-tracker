@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GroupTracker
-  GROUP_ATTRIBUTES ||= %w[
+  GROUP_ATTRIBUTES = %w[
     track_posts
     track_posts_with_priority
     add_to_navigation_bar
@@ -12,11 +12,11 @@ module GroupTracker
     "group_tracker_#{name}"
   end
 
-  OPTED_OUT ||= key("opted_out")
-  TRACK_POSTS ||= key("track_posts")
-  TRACKED_POSTS ||= key("tracked_posts")
-  PRIORITY_GROUP ||= key("track_posts_with_priority")
-  TRACKED_GROUPS ||= "tracked_groups"
+  OPTED_OUT = key("opted_out")
+  TRACK_POSTS = key("track_posts")
+  TRACKED_POSTS = key("tracked_posts")
+  PRIORITY_GROUP = key("track_posts_with_priority")
+  TRACKED_GROUPS = "tracked_groups"
 
   def self.priority_tracked_group_ids
     GroupCustomField.where(name: PRIORITY_GROUP, value: "t").pluck(:group_id)
