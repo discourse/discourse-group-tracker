@@ -2,6 +2,7 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
+
 export default class GroupTrackerGroupEdit extends Component {
   @tracked group = this.args.outletArgs.group;
 

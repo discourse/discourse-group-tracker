@@ -8,6 +8,7 @@ import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/grou
 export default class GroupTrackerNav extends Component {
   @service site;
   @service siteSettings;
+
   @alias("args.topic.currentPost") postId;
 
   getPreviousTrackedPost() {
