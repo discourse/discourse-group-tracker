@@ -1,5 +1,4 @@
 import computed from "discourse/lib/decorators";
-import { withSilencedDeprecations } from "discourse/lib/deprecated";
 import { getOwnerWithFallback } from "discourse/lib/get-owner";
 import getURL from "discourse/lib/get-url";
 import { withPluginApi } from "discourse/lib/plugin-api";
@@ -33,25 +32,6 @@ function addTrackedGroupToTopicList(api) {
       return classNames;
     }
   );
-
-  withSilencedDeprecations("discourse.hbr-topic-list-overrides", () => {
-    api.modifyClass(
-      "component:topic-list-item",
-      (Superclass) =>
-        class extends Superclass {
-          @computed("topic.first_tracked_post")
-          unboundClassNames(firstTrackedPost) {
-            let classNames = super.unboundClassNames;
-
-            if (firstTrackedPost) {
-              classNames += ` group-${firstTrackedPost.group}`;
-            }
-
-            return classNames;
-          }
-        }
-    );
-  });
 }
 
 function addNavigationBarItems(api) {
