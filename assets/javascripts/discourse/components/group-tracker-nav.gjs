@@ -2,6 +2,8 @@ import Component from "@glimmer/component";
 import { action } from "@ember/object";
 import { alias } from "@ember/object/computed";
 import { service } from "@ember/service";
+import DButton from "discourse/components/d-button";
+import icon from "discourse/helpers/d-icon";
 import DiscourseURL from "discourse/lib/url";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 
@@ -107,4 +109,27 @@ export default class GroupTrackerNav extends Component {
       DiscourseURL.routeTo(url);
     }
   }
+
+  <template>
+    <div class="group-tracker-nav">
+      {{#if this.groupTrackerPostsExist}}
+        <DButton
+          class="btn-default group-tracker-jump-prev"
+          @action={{this.jumpToPrevTrackedPost}}
+          @icon={{this.prevTrackerIcon}}
+          @disabled={{this.prevTrackedPostDisabled}}
+        >
+          {{icon "arrow-left"}}
+        </DButton>
+        <DButton
+          class="btn-default group-tracker-jump-next"
+          @action={{this.jumpToNextTrackedPost}}
+          @icon={{this.nextTrackerIcon}}
+          @disabled={{this.nextTrackedPostDisabled}}
+        >
+          {{icon "arrow-right"}}
+        </DButton>
+      {{/if}}
+    </div>
+  </template>
 }
