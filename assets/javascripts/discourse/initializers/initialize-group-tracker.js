@@ -57,7 +57,7 @@ function addNavigationBarItems(api) {
 }
 
 function addOptOutClassOnPost(api) {
-  api.includePostAttributes("opted_out");
+  api.addTrackedPostProperties("opted_out");
   api.addPostClassesCallback((p) => p.opted_out && ["opted-out"]);
 }
 
