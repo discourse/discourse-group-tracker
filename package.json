@@ -13,5 +13,5 @@
     "yarn": "please-use-pnpm",
     "pnpm": "9.x"
   },
-  "packageManager": "pnpm@9.15.5"
+  "packageManager": "pnpm@10.13.1"
 }
