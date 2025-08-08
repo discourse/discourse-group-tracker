@@ -102,15 +102,14 @@ function addOptOutToggle(api) {
 
   const site = api.container.lookup("service:site");
   const currentUser = api.container.lookup("service:current-user");
-  const composer = api.container.lookup("service:composer");
 
   api.addComposerToolbarPopupMenuOption({
     action: () => {
-      composer.toggleProperty("model.optedOut");
+      api.container.lookup("service:composer").toggleProperty("model.optedOut");
     },
     label: "group_tracker.opt_out.title",
     icon: "link-slash",
-    condition: () => {
+    condition: (composer) => {
       const action = composer.model.action;
 
       if (!site.tracked_groups) {
@@ -142,7 +141,7 @@ export default {
   name: "group-tracker",
 
   initialize() {
-    withPluginApi("0.8.9", (api) => {
+    withPluginApi((api) => {
       modifyTopicModel(api);
       addNavigationBarItems(api);
       addOptOutClassOnPost(api);
