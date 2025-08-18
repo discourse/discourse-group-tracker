@@ -36,7 +36,7 @@ export default class GroupTrackerFirstPost extends Component {
         @icon="circle-arrow-up"
         @title="group_tracker.first_post"
         @disabled={{this.disabled}}
-        @action={{action "jumpToFirstTrackedPost"}}
+        @action={{this.jumpToFirstTrackedPost}}
       />
     {{/if}}
   </template>
