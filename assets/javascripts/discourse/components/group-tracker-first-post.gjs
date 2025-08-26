@@ -3,6 +3,7 @@ import { action } from "@ember/object";
 import { readOnly } from "@ember/object/computed";
 import DButton from "discourse/components/d-button";
 import DiscourseURL from "discourse/lib/url";
+import { i18n } from "discourse-i18n";
 
 export default class GroupTrackerFirstPost extends Component {
   @readOnly("args.topic.currentPost") postId;
@@ -37,6 +38,7 @@ export default class GroupTrackerFirstPost extends Component {
         @title="group_tracker.first_post"
         @disabled={{this.disabled}}
         @action={{this.jumpToFirstTrackedPost}}
+        ariaLabel={{i18n "js.group_tracker.first_post"}}
       />
     {{/if}}
   </template>
