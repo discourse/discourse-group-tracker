@@ -19,3 +19,4 @@ en:
       next_post: "Next tracked post"
       prev_post: "Previous tracked post"
       next_group_post: "Next %{group} post"
+      prev_group_post: "Previous %{group} post"
