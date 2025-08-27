@@ -5,6 +5,7 @@ import { service } from "@ember/service";
 import DButton from "discourse/components/d-button";
 import icon from "discourse/helpers/d-icon";
 import DiscourseURL from "discourse/lib/url";
+import { i18n } from "discourse-i18n";
 import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/group-tracker-icon";
 
 export default class GroupTrackerNav extends Component {
@@ -90,6 +91,22 @@ export default class GroupTrackerNav extends Component {
     return this.prevTrackedPostGroup === null;
   }
 
+  get ariaLabelPrevPost() {
+    return this.prevTrackedPostGroup
+      ? i18n("js.group_tracker.prev_group_post", {
+          group: this.prevTrackedPostGroup,
+        })
+      : i18n("js.group_tracker.prev_post");
+  }
+
+  get ariaLabelNextPost() {
+    return this.nextTrackedPostGroup
+      ? i18n("js.group_tracker.next_group_post", {
+          group: this.nextTrackedPostGroup,
+        })
+      : i18n("js.group_tracker.next_post");
+  }
+
   @action
   jumpToNextTrackedPost() {
     const nextTrackedPost = this.getNextTrackedPost();
@@ -118,6 +135,7 @@ export default class GroupTrackerNav extends Component {
           @action={{this.jumpToPrevTrackedPost}}
           @icon={{this.prevTrackerIcon}}
           @disabled={{this.prevTrackedPostDisabled}}
+          ariaLabel={{this.ariaLabelPrevPost}}
         >
           {{icon "arrow-left"}}
         </DButton>
@@ -126,6 +144,7 @@ export default class GroupTrackerNav extends Component {
           @action={{this.jumpToNextTrackedPost}}
           @icon={{this.nextTrackerIcon}}
           @disabled={{this.nextTrackedPostDisabled}}
+          ariaLabel={{this.ariaLabelNextPost}}
         >
           {{icon "arrow-right"}}
         </DButton>

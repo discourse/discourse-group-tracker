@@ -2,12 +2,18 @@
   background-color: var(--secondary);
   display: inline-flex;
   height: 100%;
+  gap: 0.5em;
 
   .btn {
     display: inline-flex;
+    gap: 0.15em;
   }
 }
 
 .group-tracker {
   height: 100%;
+}
+
+.group-tracker-jump-prev {
+  flex-direction: row-reverse;
 }
