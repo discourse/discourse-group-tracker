@@ -135,7 +135,8 @@ export default class GroupTrackerNav extends Component {
           @action={{this.jumpToPrevTrackedPost}}
           @icon={{this.prevTrackerIcon}}
           @disabled={{this.prevTrackedPostDisabled}}
-          ariaLabel={{this.ariaLabelPrevPost}}
+          aria-label={{this.ariaLabelPrevPost}}
+          title={{this.ariaLabelPrevPost}}
         >
           {{icon "arrow-left"}}
         </DButton>
@@ -144,7 +145,8 @@ export default class GroupTrackerNav extends Component {
           @action={{this.jumpToNextTrackedPost}}
           @icon={{this.nextTrackerIcon}}
           @disabled={{this.nextTrackedPostDisabled}}
-          ariaLabel={{this.ariaLabelNextPost}}
+          aria-label={{this.ariaLabelNextPost}}
+          title={{this.ariaLabelNextPost}}
         >
           {{icon "arrow-right"}}
         </DButton>
