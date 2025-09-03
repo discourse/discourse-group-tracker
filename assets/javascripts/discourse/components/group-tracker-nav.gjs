@@ -135,8 +135,8 @@ export default class GroupTrackerNav extends Component {
           @action={{this.jumpToPrevTrackedPost}}
           @icon={{this.prevTrackerIcon}}
           @disabled={{this.prevTrackedPostDisabled}}
-          @ariaLabel={{this.ariaLabelPrevPost}}
-          @title={{this.ariaLabelPrevPost}}
+          aria-label={{this.ariaLabelPrevPost}}
+          title={{this.ariaLabelPrevPost}}
         >
           {{icon "arrow-left"}}
         </DButton>
