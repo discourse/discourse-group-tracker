@@ -91,7 +91,7 @@ export default class GroupTrackerGroupEdit extends Component {
         <TextField
           @name="tracked_post_icon"
           @value={{this.group.tracked_post_icon}}
-          @focus-out={{action this.trackedPostIconChanged}}
+          @focus-out={{this.trackedPostIconChanged}}
           @placeholderKey="group_tracker.tracked_post_icon.placeholder"
           @disabled={{if this.group.track_posts false true}}
         />
