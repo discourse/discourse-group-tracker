@@ -4,6 +4,7 @@ import { Input } from "@ember/component";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import TextField from "discourse/components/text-field";
+import withEventValue from "discourse/helpers/with-event-value";
 import { ajax } from "discourse/lib/ajax";
 import { i18n } from "discourse-i18n";
 
@@ -50,7 +51,7 @@ export default class GroupTrackerGroupEdit extends Component {
             @checked={{this.group.track_posts}}
             {{on
               "change"
-              (action this.trackPostsChanged value="target.checked")
+              (withEventValue this.trackPostsChanged "target.checked")
             }}
           />
           {{i18n "group_tracker.track_posts"}}
@@ -63,7 +64,7 @@ export default class GroupTrackerGroupEdit extends Component {
             disabled={{if this.group.track_posts false true}}
             {{on
               "change"
-              (action this.trackedPostPriorityGroup value="target.checked")
+              (withEventValue this.trackedPostPriorityGroup "target.checked")
             }}
           />
           {{i18n "group_tracker.track_posts_with_priority"}}
@@ -76,7 +77,7 @@ export default class GroupTrackerGroupEdit extends Component {
             disabled={{if this.group.track_posts false true}}
             {{on
               "change"
-              (action this.addToNavigationBarChanged value="target.checked")
+              (withEventValue this.addToNavigationBarChanged "target.checked")
             }}
           />
           {{i18n "group_tracker.add_to_navigation_bar"}}
