@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "rails_helper"
 require_relative "./../../lib/group_tracker"
 
 describe GroupTracker do

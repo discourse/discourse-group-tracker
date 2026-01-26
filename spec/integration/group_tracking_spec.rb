@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "rails_helper"
-
 describe "Group Tracking" do
   let(:user) { Fabricate(:user, refresh_auto_groups: true) }
   let(:admin) { Fabricate(:admin) }

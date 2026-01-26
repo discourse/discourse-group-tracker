@@ -9,8 +9,6 @@ module("Integration | Component | group-tracker-nav", function (hooks) {
   setupRenderingTest(hooks);
 
   test("It renders", async function (assert) {
-    const self = this;
-
     const store = getOwner(this).lookup("service:store");
     const topic = store.createRecord("topic", {
       id: 100,
@@ -24,7 +22,7 @@ module("Integration | Component | group-tracker-nav", function (hooks) {
     topic.set("currentPost", 1);
     this.set("topic", topic);
     await render(
-      <template><GroupTrackerNav @topic={{self.topic}} /></template>
+      <template><GroupTrackerNav @topic={{this.topic}} /></template>
     );
 
     assert.ok(exists(".group-tracker-jump-next"));
