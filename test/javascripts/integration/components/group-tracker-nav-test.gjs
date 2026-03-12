@@ -2,13 +2,12 @@ import { getOwner } from "@ember/owner";
 import { render } from "@ember/test-helpers";
 import { module, test } from "qunit";
 import { setupRenderingTest } from "discourse/tests/helpers/component-test";
-import { exists } from "discourse/tests/helpers/qunit-helpers";
 import GroupTrackerNav from "discourse/plugins/discourse-group-tracker/discourse/components/group-tracker-nav";
 
 module("Integration | Component | group-tracker-nav", function (hooks) {
   setupRenderingTest(hooks);
 
-  test("It renders", async function (assert) {
+  test("it renders", async function (assert) {
     const store = getOwner(this).lookup("service:store");
     const topic = store.createRecord("topic", {
       id: 100,
@@ -20,11 +19,9 @@ module("Integration | Component | group-tracker-nav", function (hooks) {
     });
     topic.postStream.set("stream", [100, 200, 300, 500]);
     topic.set("currentPost", 1);
-    this.set("topic", topic);
-    await render(
-      <template><GroupTrackerNav @topic={{this.topic}} /></template>
-    );
 
-    assert.ok(exists(".group-tracker-jump-next"));
+    await render(<template><GroupTrackerNav @topic={{topic}} /></template>);
+
+    assert.dom(".group-tracker-jump-next").exists();
   });
 });
