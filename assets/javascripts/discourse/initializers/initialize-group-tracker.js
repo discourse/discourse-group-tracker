@@ -1,4 +1,4 @@
-import computed from "discourse/lib/decorators";
+import { computed } from "@ember/object";
 import { getOwnerWithFallback } from "discourse/lib/get-owner";
 import getURL from "discourse/lib/get-url";
 import { withPluginApi } from "discourse/lib/plugin-api";
@@ -14,8 +14,12 @@ function modifyTopicModel(api) {
       class extends Superclass {
         // used in the 'topic-list-before-status' connector
         @computed("first_tracked_post.group")
-        firstTrackedPostIcon(group) {
-          return groupTrackerIcon(group, this.site, this.siteSettings);
+        get firstTrackedPostIcon() {
+          return groupTrackerIcon(
+            this.first_tracked_post?.group,
+            this.site,
+            this.siteSettings
+          );
         }
       }
   );

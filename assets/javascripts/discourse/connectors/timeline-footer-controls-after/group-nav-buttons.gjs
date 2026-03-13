@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-classic-components */
 import Component from "@ember/component";
 import { classNames, tagName } from "@ember-decorators/component";
 import GroupTrackerNav from "../../components/group-tracker-nav";
