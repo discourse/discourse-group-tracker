@@ -35,6 +35,10 @@ export default class GroupTrackerGroupEdit extends Component {
           {{i18n "group_tracker.track_posts"}}
         </label>
 
+        <div class="control-instructions">
+          {{i18n "group_tracker.track_posts_warning"}}
+        </div>
+
         <label>
           <Input
             {{on
