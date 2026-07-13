@@ -1,4 +1,3 @@
-import { computed } from "@ember/object";
 import { getOwnerWithFallback } from "discourse/lib/get-owner";
 import getURL from "discourse/lib/get-url";
 import { withPluginApi } from "discourse/lib/plugin-api";
@@ -8,21 +7,14 @@ import groupTrackerIcon from "discourse/plugins/discourse-group-tracker/lib/grou
 const PLUGIN_ID = "discourse-group-tracker";
 
 function modifyTopicModel(api) {
-  api.modifyClass(
-    "model:topic",
-    (Superclass) =>
-      class extends Superclass {
-        // used in the 'topic-list-before-status' connector
-        @computed("first_tracked_post.group")
-        get firstTrackedPostIcon() {
-          return groupTrackerIcon(
-            this.first_tracked_post?.group,
-            this.site,
-            this.siteSettings
-          );
-        }
-      }
-  );
+  // used in the 'topic-list-before-status' connector
+  api.addModelGetter("topic", "firstTrackedPostIcon", function () {
+    return groupTrackerIcon(
+      this.first_tracked_post?.group,
+      this.site,
+      this.siteSettings
+    );
+  });
 }
 
 function addTrackedGroupToTopicList(api) {
@@ -74,35 +66,22 @@ function addOptOutToggle(api) {
     classNameBindings: ["composer.optedOut"],
   });
 
-  api.modifyClass(
-    "model:composer",
-    (Superclass) =>
-      class extends Superclass {
-        groupTrackerOptOut(opts) {
-          this.set("optedOut", opts.post && opts.post.opted_out);
-        }
+  api.addModelMethod("composer", "groupTrackerOptOut", function (opts) {
+    this.set("optedOut", opts.post && opts.post.opted_out);
+  });
 
-        open(opts) {
-          opts = opts || {};
-          return super.open(opts).then(() => this.groupTrackerOptOut(opts));
-        }
-      }
+  api.registerBehaviorTransformer("composer-open", ({ context, next }) =>
+    next().then(() => context.composer.groupTrackerOptOut(context.opts))
   );
 
-  api.modifyClass(
-    "model:post",
-    (Superclass) =>
-      class extends Superclass {
-        beforeCreate(props) {
-          const composerController =
-            getOwnerWithFallback(this).lookup("service:composer");
+  api.addModelCallback("post", "beforeCreate", function (props) {
+    const composerController =
+      getOwnerWithFallback(this).lookup("service:composer");
 
-          if (composerController.get("model.optedOut")) {
-            props.opted_out = true;
-          }
-        }
-      }
-  );
+    if (composerController.get("model.optedOut")) {
+      props.opted_out = true;
+    }
+  });
 
   const site = api.container.lookup("service:site");
   const currentUser = api.container.lookup("service:current-user");
