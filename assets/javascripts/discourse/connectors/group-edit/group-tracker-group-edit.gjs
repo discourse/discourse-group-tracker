@@ -3,7 +3,7 @@ import { Input } from "@ember/component";
 import { fn } from "@ember/helper";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
-import TextField from "discourse/components/text-field";
+import TextField from "discourse/ui-kit/d-text-field";
 import withEventValue from "discourse/helpers/with-event-value";
 import { ajax } from "discourse/lib/ajax";
 import { i18n } from "discourse-i18n";
