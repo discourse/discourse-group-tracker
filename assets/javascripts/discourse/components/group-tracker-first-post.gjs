@@ -1,7 +1,7 @@
 import Component from "@glimmer/component";
 import { action } from "@ember/object";
 import { readOnly } from "@ember/object/computed";
-import DButton from "discourse/components/d-button";
+import DButton from "discourse/ui-kit/d-button";
 import DiscourseURL from "discourse/lib/url";
 import { i18n } from "discourse-i18n";
 
