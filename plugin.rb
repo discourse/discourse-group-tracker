@@ -184,8 +184,8 @@ after_initialize do
 
     # we're only concerned when there was an ownership change
     next unless user_ids = post.previous_changes["user_id"]
-    # and only if a human was concerned
-    next unless user_ids.any? { |id| id > 0 }
+    # and only if a human was concerned (a deleted author leaves a nil user_id)
+    next unless user_ids.any? { |id| id.to_i > 0 }
 
     primary_group_ids = User.where(id: user_ids).pluck(:primary_group_id)
 
