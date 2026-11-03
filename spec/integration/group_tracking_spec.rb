@@ -229,6 +229,23 @@ describe "Group Tracking" do
       expect(post3.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to be(nil)
     end
 
+    it "tracks a post whose deleted author is replaced by a tracked user" do
+      post1.update_columns(user_id: nil)
+      sign_in(admin)
+
+      post "/t/#{topic.id}/change-owner.json",
+           params: {
+             post_ids: [post1.id],
+             username: member2.username,
+           }
+
+      expect(response.status).to eq(200)
+      expect(post1.reload.custom_fields[GroupTracker::TRACKED_POSTS]).to eq(
+        "group" => tracked_group.name,
+        "post_number" => 2,
+      )
+    end
+
     context "when the group is a priority group" do
       it "changes the group that the topic is tracking" do
         sign_in(admin)
